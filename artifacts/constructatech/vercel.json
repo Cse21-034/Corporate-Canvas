@@ -2,6 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "dist/public",
   "rewrites": [
-    { "source": "/((?!assets/|favicon\\.svg|robots\\.txt).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|assets/|favicon\\.svg|robots\\.txt).*)", "destination": "/index.html" }
   ]
 }
