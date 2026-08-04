@@ -42,6 +42,17 @@ To push schema changes:
 pnpm --filter @workspace/db run push
 ```
 
+To seed the database (safe to re-run — uses upserts):
+```
+pnpm --filter @workspace/db run seed
+```
+
+**Seed creates:**
+- 4 services (IT Infrastructure, Networking, IT Supplies, Automation)
+- 8 industries (Mining, Manufacturing, Healthcare, Education, Retail, Financial Services, Telecoms, Government)
+- Demo staff admin → `admin@constructech.co.bw` / `Admin1234!`
+- Demo portal customer → `portal@bmcorp.co.bw` / `Demo1234!` (with a project, ticket, and invoice)
+
 ## Environment variables / secrets
 
 | Key | Where | Notes |
