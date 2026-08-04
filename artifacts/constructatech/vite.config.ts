@@ -30,7 +30,10 @@ function resolvePort(required: boolean) {
 
 export default defineConfig(async ({ command }) => {
   const port = resolvePort(command === 'serve');
-  const basePath = process.env.BASE_PATH ?? '/';
+  // BASE_PATH is the Replit artifact sub-path (e.g. /sfgdhnfjmghbmhh). On
+  // Vercel the app is served from the domain root, so that sub-path would
+  // make index.html reference assets that don't exist there.
+  const basePath = process.env.VERCEL ? '/' : (process.env.BASE_PATH ?? '/');
 
   return {
     base: basePath,
