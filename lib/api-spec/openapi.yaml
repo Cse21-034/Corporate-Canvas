@@ -3,20 +3,32 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Constructatech Ventures API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: services
+    description: IT services offered
+  - name: industries
+    description: Industries served
+  - name: quotes
+    description: Quote requests
+  - name: auth
+    description: Authentication
+  - name: portal
+    description: Client portal
+  - name: admin
+    description: Staff admin operations
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +36,497 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /services:
+    get:
+      operationId: listServices
+      tags: [services]
+      summary: List all services
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+
+  /services/{slug}:
+    get:
+      operationId: getService
+      tags: [services]
+      summary: Get service by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "404":
+          description: Not found
+
+  /industries:
+    get:
+      operationId: listIndustries
+      tags: [industries]
+      summary: List all industries
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Industry"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [services]
+      summary: Company stats and highlights
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyStats"
+
+  /quote-requests:
+    post:
+      operationId: submitQuoteRequest
+      tags: [quotes]
+      summary: Submit a quote request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteRequestInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteRequest"
+        "400":
+          description: Validation error
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Log in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Unauthorized
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Log out
+      responses:
+        "204":
+          description: No content
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Unauthorized
+
+  /portal/dashboard:
+    get:
+      operationId: getPortalDashboard
+      tags: [portal]
+      summary: Get portal dashboard summary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortalDashboard"
+        "401":
+          description: Unauthorized
+
+  /portal/projects:
+    get:
+      operationId: listPortalProjects
+      tags: [portal]
+      summary: List my projects
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        "401":
+          description: Unauthorized
+
+  /portal/projects/{id}:
+    get:
+      operationId: getPortalProject
+      tags: [portal]
+      summary: Get project detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /portal/tickets:
+    get:
+      operationId: listPortalTickets
+      tags: [portal]
+      summary: List my tickets
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ticket"
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createPortalTicket
+      tags: [portal]
+      summary: Create a new support ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+        "401":
+          description: Unauthorized
+
+  /portal/tickets/{id}:
+    get:
+      operationId: getPortalTicket
+      tags: [portal]
+      summary: Get ticket with messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
+  /portal/tickets/{id}/messages:
+    post:
+      operationId: addTicketMessage
+      tags: [portal]
+      summary: Add message to ticket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketMessageInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketMessage"
+        "401":
+          description: Unauthorized
+
+  /portal/invoices:
+    get:
+      operationId: listPortalInvoices
+      tags: [portal]
+      summary: List my invoices
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Invoice"
+        "401":
+          description: Unauthorized
+
+  /portal/account:
+    get:
+      operationId: getPortalAccount
+      tags: [portal]
+      summary: Get my account details
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerAccount"
+        "401":
+          description: Unauthorized
+    patch:
+      operationId: updatePortalAccount
+      tags: [portal]
+      summary: Update my account details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerAccountUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerAccount"
+        "401":
+          description: Unauthorized
+
+  /admin/quote-requests:
+    get:
+      operationId: listAdminQuoteRequests
+      tags: [admin]
+      summary: List all quote requests (staff only)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuoteRequest"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+
+  /admin/quote-requests/{id}:
+    patch:
+      operationId: updateAdminQuoteRequest
+      tags: [admin]
+      summary: Update quote request status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteRequestUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteRequest"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+
+  /admin/customers:
+    get:
+      operationId: listAdminCustomers
+      tags: [admin]
+      summary: List all customers (staff only)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Customer"
+        "401":
+          description: Unauthorized
+
+  /admin/projects:
+    get:
+      operationId: listAdminProjects
+      tags: [admin]
+      summary: List all projects (staff only)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createAdminProject
+      tags: [admin]
+      summary: Create a new project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "401":
+          description: Unauthorized
+
+  /admin/projects/{id}:
+    patch:
+      operationId: updateAdminProject
+      tags: [admin]
+      summary: Update a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "401":
+          description: Unauthorized
+
+  /admin/tickets:
+    get:
+      operationId: listAdminTickets
+      tags: [admin]
+      summary: List all tickets (staff only)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ticket"
+        "401":
+          description: Unauthorized
+
+  /admin/invoices:
+    get:
+      operationId: listAdminInvoices
+      tags: [admin]
+      summary: List all invoices (staff only)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Invoice"
+        "401":
+          description: Unauthorized
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +537,398 @@ components:
       required:
         - status
 
+    Service:
+      type: object
+      required: [id, slug, title, summary, includes, icon, order]
+      properties:
+        id:
+          type: number
+        slug:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        body:
+          type: ["string", "null"]
+        includes:
+          type: array
+          items:
+            type: string
+        icon:
+          type: string
+        order:
+          type: number
+
+    Industry:
+      type: object
+      required: [id, slug, name, blurb, icon, order]
+      properties:
+        id:
+          type: number
+        slug:
+          type: string
+        name:
+          type: string
+        blurb:
+          type: string
+        icon:
+          type: string
+        order:
+          type: number
+
+    CompanyStats:
+      type: object
+      required: [projectsCompleted, clientsServed, yearsActive, industriesServed]
+      properties:
+        projectsCompleted:
+          type: number
+        clientsServed:
+          type: number
+        yearsActive:
+          type: number
+        industriesServed:
+          type: number
+
+    QuoteRequestInput:
+      type: object
+      required: [name, company, email, phone, message]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        company:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          
+        phone:
+          type: string
+        serviceInterest:
+          type: array
+          items:
+            type: string
+        industry:
+          type: ["string", "null"]
+        message:
+          type: string
+          minLength: 1
+        honeypot:
+          type: ["string", "null"]
+
+    QuoteRequest:
+      type: object
+      required: [id, name, company, email, phone, message, status, createdAt]
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        company:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        serviceInterest:
+          type: array
+          items:
+            type: string
+        industry:
+          type: ["string", "null"]
+        message:
+          type: string
+        status:
+          type: string
+          enum: [new, contacted, quoted, won, lost]
+        createdAt:
+          type: string
+
+    QuoteRequestUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [new, contacted, quoted, won, lost]
+
+    LoginInput:
+      type: object
+      required: [email, password, role]
+      properties:
+        email:
+          type: string
+          
+        password:
+          type: string
+        role:
+          type: string
+          enum: [customer, staff]
+
+    AuthUser:
+      type: object
+      required: [id, email, name, role]
+      properties:
+        id:
+          type: number
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+        companyName:
+          type: ["string", "null"]
+
+    PortalDashboard:
+      type: object
+      required: [activeProjects, openTickets, unpaidInvoices, recentActivity]
+      properties:
+        activeProjects:
+          type: number
+        openTickets:
+          type: number
+        unpaidInvoices:
+          type: number
+        totalInvoiceAmount:
+          type: number
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityItem"
+
+    ActivityItem:
+      type: object
+      required: [id, type, description, createdAt]
+      properties:
+        id:
+          type: number
+        type:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+
+    Milestone:
+      type: object
+      required: [label, done]
+      properties:
+        label:
+          type: string
+        dueDate:
+          type: ["string", "null"]
+        done:
+          type: boolean
+
+    Project:
+      type: object
+      required: [id, title, description, status, customerId, milestones, createdAt]
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [scoping, in-progress, on-hold, completed]
+        customerId:
+          type: number
+        customerName:
+          type: ["string", "null"]
+        milestones:
+          type: array
+          items:
+            $ref: "#/components/schemas/Milestone"
+        startDate:
+          type: ["string", "null"]
+        targetDate:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ProjectInput:
+      type: object
+      required: [title, description, customerId]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        customerId:
+          type: number
+        status:
+          type: string
+          enum: [scoping, in-progress, on-hold, completed]
+        milestones:
+          type: array
+          items:
+            $ref: "#/components/schemas/Milestone"
+        startDate:
+          type: ["string", "null"]
+        targetDate:
+          type: ["string", "null"]
+
+    ProjectUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum: [scoping, in-progress, on-hold, completed]
+        milestones:
+          type: array
+          items:
+            $ref: "#/components/schemas/Milestone"
+        targetDate:
+          type: ["string", "null"]
+
+    TicketMessage:
+      type: object
+      required: [id, author, body, isStaff, createdAt]
+      properties:
+        id:
+          type: number
+        author:
+          type: string
+        body:
+          type: string
+        isStaff:
+          type: boolean
+        createdAt:
+          type: string
+
+    Ticket:
+      type: object
+      required: [id, subject, type, priority, status, customerId, messages, createdAt]
+      properties:
+        id:
+          type: number
+        subject:
+          type: string
+        type:
+          type: string
+          enum: [support, change-request]
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+        status:
+          type: string
+          enum: [open, in-progress, resolved, closed]
+        customerId:
+          type: number
+        customerName:
+          type: ["string", "null"]
+        projectId:
+          type: ["number", "null"]
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/TicketMessage"
+        createdAt:
+          type: string
+
+    TicketInput:
+      type: object
+      required: [subject, type, priority, body]
+      properties:
+        subject:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          enum: [support, change-request]
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+        projectId:
+          type: ["number", "null"]
+        body:
+          type: string
+          minLength: 1
+
+    TicketMessageInput:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          minLength: 1
+
+    Invoice:
+      type: object
+      required: [id, number, customerId, amount, currency, status, issueDate, dueDate, createdAt]
+      properties:
+        id:
+          type: number
+        number:
+          type: string
+        customerId:
+          type: number
+        customerName:
+          type: ["string", "null"]
+        projectId:
+          type: ["number", "null"]
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [draft, sent, paid, overdue]
+        issueDate:
+          type: string
+        dueDate:
+          type: string
+        createdAt:
+          type: string
+
+    Customer:
+      type: object
+      required: [id, companyName, contactName, email, phone, status, createdAt]
+      properties:
+        id:
+          type: number
+        companyName:
+          type: string
+        contactName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]
+        createdAt:
+          type: string
+
+    CustomerAccount:
+      type: object
+      required: [id, companyName, contactName, email, phone]
+      properties:
+        id:
+          type: number
+        companyName:
+          type: string
+        contactName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+
+    CustomerAccountUpdate:
+      type: object
+      properties:
+        contactName:
+          type: string
+        phone:
+          type: string
+        companyName:
+          type: string
