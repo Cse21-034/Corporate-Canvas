@@ -51,6 +51,32 @@ pnpm --filter @workspace/db run push
 | `NODE_ENV` | Optional | Defaults to `development` |
 | `LOG_LEVEL` | Optional | Pino log level (default: `info`) |
 
+## Deploying to Vercel (frontend) + Render (backend)
+
+### Render — API server
+
+1. Connect your GitHub repo to [render.com](https://render.com) and select **"Use render.yaml"** — it auto-creates the `constructatech-api` web service and a managed PostgreSQL database.
+2. After the first deploy, go to the service's **Environment** tab and set:
+   - `CORS_ORIGIN` → your Vercel frontend URL (e.g. `https://your-app.vercel.app`)
+3. Note the service URL (e.g. `https://constructatech-api.onrender.com`) — you'll need it for Vercel.
+4. Run the schema migration once: in the Render shell run `pnpm --filter @workspace/db run push`.
+
+### Vercel — Frontend
+
+1. Import the repo on [vercel.com](https://vercel.com). Vercel will auto-detect `vercel.json` at the root.
+2. In **Environment Variables**, add:
+   - `BASE_PATH` → `/`
+   - `VITE_API_URL` → your Render service URL (e.g. `https://constructatech-api.onrender.com`)
+3. Deploy. All client-side routes are rewritten to `index.html` by `vercel.json`.
+
+### Config files
+| File | Purpose |
+|---|---|
+| `vercel.json` | Build command, output dir, SPA rewrites |
+| `render.yaml` | API service + managed Postgres definition |
+| `artifacts/constructatech/.env.example` | Frontend env var reference |
+| `artifacts/api-server/.env.example` | Backend env var reference |
+
 ## User preferences
 
 _None recorded yet._

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm install && pnpm --filter @workspace/constructatech run build",
+  "outputDirectory": "artifacts/constructatech/dist/public",
+  "installCommand": "pnpm install",
+  "rewrites": [
+    { "source": "/((?!assets/|favicon\\.svg).*)", "destination": "/index.html" }
+  ],
+  "env": {
+    "BASE_PATH": "/"
+  }
+}

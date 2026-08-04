@@ -26,7 +26,17 @@ app.use(
     },
   }),
 );
-app.use(cors({ origin: true, credentials: true }));
+// In production, restrict CORS to the explicit allow-list in CORS_ORIGIN
+// (comma-separated URLs).  In development, allow any origin for convenience.
+const corsOrigin: string | boolean =
+  process.env.NODE_ENV === "production" && process.env.CORS_ORIGIN
+    ? // support multiple comma-separated origins
+      process.env.CORS_ORIGIN.split(",").map((s) => s.trim()).length === 1
+      ? process.env.CORS_ORIGIN.trim()
+      : process.env.CORS_ORIGIN.split(",").map((s) => s.trim())
+    : true;
+
+app.use(cors({ origin: corsOrigin, credentials: true }));
 app.use(cookieParser(process.env.SESSION_SECRET || "ctv_default_secret"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

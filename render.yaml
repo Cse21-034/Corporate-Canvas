@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: constructatech-api
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: "pnpm install && pnpm --filter @workspace/api-server run build"
+    startCommand: "node --enable-source-maps artifacts/api-server/dist/index.mjs"
+    healthCheckPath: /api/healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: constructatech-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false   # set this manually to your Vercel frontend URL, e.g. https://your-app.vercel.app
+      - key: LOG_LEVEL
+        value: info
+
+databases:
+  - name: constructatech-db
+    databaseName: constructatech
+    user: constructatech
+    region: oregon
+    plan: free
