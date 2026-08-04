@@ -20,10 +20,14 @@ function sign(value: string): string {
 export function setSession(res: Response, payload: SessionPayload): void {
   const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const sig = sign(encoded);
+  // In production the API and the frontend are on different sites (Render vs
+  // Vercel), so the cookie has to be SameSite=None or the browser won't send
+  // it with cross-site requests. SameSite=None requires Secure.
+  const isProduction = process.env.NODE_ENV === "production";
   res.cookie(COOKIE_NAME, `${encoded}.${sig}`, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: MAX_AGE,
   });
 }
