@@ -6,7 +6,7 @@ import { Link, useLocation } from 'wouter';
 
 export default function PortalLogin() {
   const [, setLocation] = useLocation();
-  const { data: user, isLoading: isUserLoading } = useGetMe();
+  const { data: user } = useGetMe();
   const loginMutation = useLogin();
   
   const [role, setRole] = useState<'customer' | 'staff'>('customer');
@@ -31,9 +31,11 @@ export default function PortalLogin() {
     });
   };
 
-  if (isUserLoading) {
-    return <div className="min-h-screen bg-foreground flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
-  }
+  // The form renders straight away rather than waiting on the session check.
+  // Visitors reaching this page are almost always logged out, so blocking on
+  // /auth/me made them sit through the whole round trip — including the API's
+  // cold start — before they could type anything. Anyone who does turn out to
+  // have a session is redirected by the effect above once it resolves.
 
   return (
     <div className="min-h-screen bg-foreground flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
