@@ -12,7 +12,8 @@
  *   - 1 demo project, ticket, and invoice linked to the demo customer
  */
 
-import { createHash } from "crypto";
+import bcrypt from "bcryptjs";
+import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import * as schema from "./schema";
@@ -30,8 +31,8 @@ const db = drizzle(pool, { schema });
 // Helpers
 // ---------------------------------------------------------------------------
 
-function hashPassword(password: string): string {
-  return createHash("sha256").update(password + "ctv_salt_2025").digest("hex");
+function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 10);
 }
 
 // ---------------------------------------------------------------------------
@@ -49,6 +50,7 @@ const SERVICES = [
 Our engineers hold vendor certifications from Dell, HP, and Cisco, and every project follows a structured methodology: discovery, design, build, test, and handover with full documentation. We also provide ongoing management retainers so your infrastructure stays current, patched, and performant.`,
     includes: ["Data Center Design & Build", "Cloud Infrastructure (hybrid & private)", "Server & Storage Solutions", "Virtualisation (VMware / Hyper-V)", "Disaster Recovery & Backup"],
     icon: "server",
+    imageUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=70",
     order: 1,
   },
   {
@@ -61,6 +63,7 @@ Our engineers hold vendor certifications from Dell, HP, and Cisco, and every pro
 Security is built in from the start — not bolted on afterwards. Every engagement includes a threat-model review, firewall policy design, and a post-implementation penetration test to verify the controls are working.`,
     includes: ["Network Architecture & Design", "LAN / WAN / SD-WAN", "Firewalls & Unified Threat Management", "Wireless (Wi-Fi 6) Deployments", "Network Monitoring & NOC Support"],
     icon: "network",
+    imageUrl: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=70",
     order: 2,
   },
   {
@@ -73,6 +76,7 @@ Security is built in from the start — not bolted on afterwards. Every engageme
 Whether you need 10 laptops for a new team or 100 managed switches for a campus rollout, our procurement team will find the best-value configuration for your workload and budget — with no grey-market risk.`,
     includes: ["Servers, Switches & Routers", "Laptops, Desktops & Workstations", "Storage Arrays & NAS", "UPS & Power Protection", "Peripherals & Accessories"],
     icon: "monitor",
+    imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=70",
     order: 3,
   },
   {
@@ -85,6 +89,7 @@ Whether you need 10 laptops for a new team or 100 managed switches for a campus 
 Our Building Management System (BMS) practice covers HVAC control, access control, CCTV, and energy metering for commercial and public-sector buildings. Remote monitoring means issues are caught before they become failures.`,
     includes: ["Industrial Automation (PLC / SCADA)", "Building Management Systems (BMS)", "Remote Monitoring & IoT", "CCTV & Physical Security", "Energy Metering & Optimisation"],
     icon: "cpu",
+    imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=70",
     order: 4,
   },
 ];
@@ -178,6 +183,10 @@ async function seed() {
           includes: service.includes,
           icon: service.icon,
           order: service.order,
+          // Fill the image only when the row hasn't got one. Services seeded
+          // before this column existed pick up the default, while anything an
+          // admin has set survives the next deploy's re-seed.
+          imageUrl: sql`coalesce(${schema.servicesTable.imageUrl}, excluded.image_url)`,
         },
       });
   }
@@ -203,12 +212,13 @@ async function seed() {
 
   // --- Demo admin staff ---
   console.log("  ↳ Staff");
+  const adminHash = await hashPassword("Admin1234!");
   await db
     .insert(schema.staffTable)
     .values({
       name: "Admin User",
       email: "admin@constructech.co.bw",
-      passwordHash: hashPassword("Admin1234!"),
+      passwordHash: adminHash,
       role: "admin",
     })
     .onConflictDoUpdate({
@@ -216,20 +226,21 @@ async function seed() {
       set: {
         name: "Admin User",
         role: "admin",
-        passwordHash: hashPassword("Admin1234!"),
+        passwordHash: adminHash,
       },
     });
   console.log("     ✔  1 admin staff upserted  (admin@constructech.co.bw / Admin1234!)");
 
   // --- Demo customer ---
   console.log("  ↳ Customer");
+  const customerHash = await hashPassword("Demo1234!");
   const [customer] = await db
     .insert(schema.customersTable)
     .values({
       companyName: "Botswana Mining Corp",
       contactName: "Thabo Mokobi",
       email: "portal@bmcorp.co.bw",
-      passwordHash: hashPassword("Demo1234!"),
+      passwordHash: customerHash,
       phone: "+267 71 234 567",
       status: "active",
     })
@@ -240,6 +251,9 @@ async function seed() {
         contactName: "Thabo Mokobi",
         phone: "+267 71 234 567",
         status: "active",
+        // Rewritten on every seed so the demo login keeps working across a
+        // change of hashing algorithm.
+        passwordHash: customerHash,
       },
     })
     .returning();

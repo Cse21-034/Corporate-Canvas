@@ -1,7 +1,8 @@
 import { Router, type IRouter } from "express";
 import { eq, desc } from "drizzle-orm";
-import { db, quoteRequestsTable, customersTable, projectsTable, ticketsTable, invoicesTable } from "@workspace/db";
+import { db, quoteRequestsTable, customersTable, projectsTable, ticketsTable, invoicesTable, servicesTable } from "@workspace/db";
 import { getSession } from "../lib/session";
+import { hashPassword } from "../lib/auth";
 
 const router: IRouter = Router();
 
@@ -40,9 +41,78 @@ router.patch("/admin/quote-requests/:id", requireStaff, async (req, res): Promis
   res.json({ ...record, createdAt: record.createdAt.toISOString() });
 });
 
+router.patch("/admin/services/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const { imageUrl } = req.body;
+
+  // An empty string clears the image; undefined means "not supplied".
+  if (imageUrl === undefined) {
+    res.status(400).json({ error: "imageUrl is required" });
+    return;
+  }
+  const value = typeof imageUrl === "string" && imageUrl.trim() !== "" ? imageUrl.trim() : null;
+  if (value !== null && !/^https?:\/\//i.test(value)) {
+    res.status(400).json({ error: "imageUrl must be an http(s) URL" });
+    return;
+  }
+
+  const [record] = await db.update(servicesTable).set({ imageUrl: value }).where(eq(servicesTable.id, id)).returning();
+  if (!record) {
+    res.status(404).json({ error: "Service not found" });
+    return;
+  }
+  res.json(record);
+});
+
 router.get("/admin/customers", requireStaff, async (_req, res): Promise<void> => {
   const customers = await db.select().from(customersTable).orderBy(desc(customersTable.createdAt));
   res.json(customers.map(c => ({ id: c.id, companyName: c.companyName, contactName: c.contactName, email: c.email, phone: c.phone, status: c.status, createdAt: c.createdAt.toISOString() })));
+});
+
+router.post("/admin/customers", requireStaff, async (req, res): Promise<void> => {
+  const { companyName, contactName, email, password, phone, status } = req.body ?? {};
+
+  if (!companyName || !contactName || !email || !password) {
+    res.status(400).json({ error: "companyName, contactName, email and password are required" });
+    return;
+  }
+
+  if (typeof password !== "string" || password.length < 8) {
+    res.status(400).json({ error: "password must be at least 8 characters" });
+    return;
+  }
+
+  const normalisedEmail = String(email).trim().toLowerCase();
+
+  const [existing] = await db.select().from(customersTable).where(eq(customersTable.email, normalisedEmail));
+  if (existing) {
+    res.status(409).json({ error: "A customer with that email already exists" });
+    return;
+  }
+
+  const [record] = await db
+    .insert(customersTable)
+    .values({
+      companyName,
+      contactName,
+      email: normalisedEmail,
+      passwordHash: await hashPassword(password),
+      phone: phone ?? "",
+      status: status ?? "active",
+    })
+    .returning();
+
+  // Never return the password hash.
+  res.status(201).json({
+    id: record.id,
+    companyName: record.companyName,
+    contactName: record.contactName,
+    email: record.email,
+    phone: record.phone,
+    status: record.status,
+    createdAt: record.createdAt.toISOString(),
+  });
 });
 
 router.get("/admin/projects", requireStaff, async (_req, res): Promise<void> => {

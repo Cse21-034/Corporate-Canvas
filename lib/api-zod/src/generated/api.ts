@@ -27,6 +27,7 @@ export const ListServicesResponseItem = zod.object({
   "body": zod.string().nullish(),
   "includes": zod.array(zod.string()),
   "icon": zod.string(),
+  "imageUrl": zod.string().nullish(),
   "order": zod.number()
 })
 export const ListServicesResponse = zod.array(ListServicesResponseItem)
@@ -47,6 +48,7 @@ export const GetServiceResponse = zod.object({
   "body": zod.string().nullish(),
   "includes": zod.array(zod.string()),
   "icon": zod.string(),
+  "imageUrl": zod.string().nullish(),
   "order": zod.number()
 })
 
@@ -430,6 +432,33 @@ export const ListAdminCustomersResponse = zod.array(ListAdminCustomersResponseIt
 
 
 /**
+ * @summary Create a customer portal account (staff only)
+ */
+export const createAdminCustomerBodyPasswordMin = 8;
+
+
+
+export const CreateAdminCustomerBody = zod.object({
+  "companyName": zod.string(),
+  "contactName": zod.string(),
+  "email": zod.string(),
+  "password": zod.string().min(createAdminCustomerBodyPasswordMin),
+  "phone": zod.string().optional(),
+  "status": zod.enum(['active', 'inactive']).optional()
+})
+
+export const CreateAdminCustomerResponse = zod.object({
+  "id": zod.number(),
+  "companyName": zod.string(),
+  "contactName": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string(),
+  "status": zod.enum(['active', 'inactive']),
+  "createdAt": zod.string()
+})
+
+
+/**
  * @summary List all projects (staff only)
  */
 export const ListAdminProjectsResponseItem = zod.object({
@@ -520,6 +549,30 @@ export const UpdateAdminProjectResponse = zod.object({
   "startDate": zod.string().nullish(),
   "targetDate": zod.string().nullish(),
   "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Update a service
+ */
+export const UpdateAdminServiceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminServiceBody = zod.object({
+  "imageUrl": zod.string().nullish()
+})
+
+export const UpdateAdminServiceResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "summary": zod.string(),
+  "body": zod.string().nullish(),
+  "includes": zod.array(zod.string()),
+  "icon": zod.string(),
+  "imageUrl": zod.string().nullish(),
+  "order": zod.number()
 })
 
 

@@ -15,5 +15,7 @@ export interface Service {
   body?: string | null;
   includes: string[];
   icon: string;
+  /** @nullable */
+  imageUrl?: string | null;
   order: number;
 }

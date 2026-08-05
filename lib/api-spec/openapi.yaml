@@ -429,6 +429,29 @@ paths:
                   $ref: "#/components/schemas/Customer"
         "401":
           description: Unauthorized
+    post:
+      operationId: createAdminCustomer
+      tags: [admin]
+      summary: Create a customer portal account (staff only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "400":
+          description: Missing or invalid fields
+        "401":
+          description: Unauthorized
+        "409":
+          description: A customer with that email already exists
 
   /admin/projects:
     get:
@@ -492,6 +515,35 @@ paths:
                 $ref: "#/components/schemas/Project"
         "401":
           description: Unauthorized
+
+  /admin/services/{id}:
+    patch:
+      operationId: updateAdminService
+      tags: [admin]
+      summary: Update a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
 
   /admin/tickets:
     get:
@@ -557,8 +609,16 @@ components:
             type: string
         icon:
           type: string
+        imageUrl:
+          type: ["string", "null"]
         order:
           type: number
+
+    ServiceUpdate:
+      type: object
+      properties:
+        imageUrl:
+          type: ["string", "null"]
 
     Industry:
       type: object
@@ -907,6 +967,25 @@ components:
           enum: [active, inactive]
         createdAt:
           type: string
+
+    CustomerInput:
+      type: object
+      required: [companyName, contactName, email, password]
+      properties:
+        companyName:
+          type: string
+        contactName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+          minLength: 8
+        phone:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]
 
     CustomerAccount:
       type: object

@@ -25,6 +25,7 @@ import type {
   Customer,
   CustomerAccount,
   CustomerAccountUpdate,
+  CustomerInput,
   HealthStatus,
   Industry,
   Invoice,
@@ -38,6 +39,7 @@ import type {
   QuoteRequestInput,
   QuoteRequestUpdate,
   Service,
+  ServiceUpdate,
   Ticket,
   TicketInput,
   TicketMessage,
@@ -1732,6 +1734,77 @@ export function useListAdminCustomers<TData = Awaited<ReturnType<typeof listAdmi
 
 
 
+export const getCreateAdminCustomerUrl = () => {
+
+
+
+
+  return `/api/admin/customers`
+}
+
+/**
+ * @summary Create a customer portal account (staff only)
+ */
+export const createAdminCustomer = async (customerInput: CustomerInput, options?: Parameters<typeof customFetch>[1]): Promise<Customer> => {
+
+  return customFetch<Customer>(getCreateAdminCustomerUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(customerInput)
+  }
+);}
+
+
+
+
+
+export const getCreateAdminCustomerMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminCustomer>>, TError,{data: BodyType<CustomerInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdminCustomer>>, TError,{data: BodyType<CustomerInput>}, TContext> => {
+
+const mutationKey = ['createAdminCustomer'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminCustomer>>, {data: BodyType<CustomerInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAdminCustomer(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdminCustomerMutationResult = NonNullable<Awaited<ReturnType<typeof createAdminCustomer>>>
+    export type CreateAdminCustomerMutationBody = BodyType<CustomerInput>
+    export type CreateAdminCustomerMutationError = ErrorType<void>
+
+    /**
+ * @summary Create a customer portal account (staff only)
+ */
+export const useCreateAdminCustomer = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminCustomer>>, TError,{data: BodyType<CustomerInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdminCustomer>>,
+        TError,
+        {data: BodyType<CustomerInput>},
+        TContext
+      > => {
+      return useMutation(getCreateAdminCustomerMutationOptions(options));
+    }
+
 export const getListAdminProjectsUrl = () => {
 
 
@@ -1950,6 +2023,78 @@ export const useUpdateAdminProject = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getUpdateAdminProjectMutationOptions(options));
+    }
+
+export const getUpdateAdminServiceUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/services/${id}`
+}
+
+/**
+ * @summary Update a service
+ */
+export const updateAdminService = async (id: number,
+    serviceUpdate: ServiceUpdate, options?: Parameters<typeof customFetch>[1]): Promise<Service> => {
+
+  return customFetch<Service>(getUpdateAdminServiceUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(serviceUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateAdminServiceMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminService>>, TError,{id: number;data: BodyType<ServiceUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateAdminService>>, TError,{id: number;data: BodyType<ServiceUpdate>}, TContext> => {
+
+const mutationKey = ['updateAdminService'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAdminService>>, {id: number;data: BodyType<ServiceUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateAdminService(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAdminServiceMutationResult = NonNullable<Awaited<ReturnType<typeof updateAdminService>>>
+    export type UpdateAdminServiceMutationBody = BodyType<ServiceUpdate>
+    export type UpdateAdminServiceMutationError = ErrorType<void>
+
+    /**
+ * @summary Update a service
+ */
+export const useUpdateAdminService = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAdminService>>, TError,{id: number;data: BodyType<ServiceUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateAdminService>>,
+        TError,
+        {id: number;data: BodyType<ServiceUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateAdminServiceMutationOptions(options));
     }
 
 export const getListAdminTicketsUrl = () => {

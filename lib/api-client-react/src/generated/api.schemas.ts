@@ -18,7 +18,14 @@ export interface Service {
   body?: string | null;
   includes: string[];
   icon: string;
+  /** @nullable */
+  imageUrl?: string | null;
   order: number;
+}
+
+export interface ServiceUpdate {
+  /** @nullable */
+  imageUrl?: string | null;
 }
 
 export interface Industry {
@@ -332,6 +339,24 @@ export interface Customer {
   phone: string;
   status: CustomerStatus;
   createdAt: string;
+}
+
+export type CustomerInputStatus = typeof CustomerInputStatus[keyof typeof CustomerInputStatus];
+
+
+export const CustomerInputStatus = {
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+export interface CustomerInput {
+  companyName: string;
+  contactName: string;
+  email: string;
+  /** @minLength 8 */
+  password: string;
+  phone?: string;
+  status?: CustomerInputStatus;
 }
 
 export interface CustomerAccount {

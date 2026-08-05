@@ -13,9 +13,12 @@ router.post("/auth/login", async (req, res): Promise<void> => {
     return;
   }
 
+  // Accounts are stored with a lower-cased email, so look up the same way.
+  const lookupEmail = String(email).trim().toLowerCase();
+
   if (role === "staff") {
-    const [staff] = await db.select().from(staffTable).where(eq(staffTable.email, email));
-    if (!staff || !verifyPassword(password, staff.passwordHash)) {
+    const [staff] = await db.select().from(staffTable).where(eq(staffTable.email, lookupEmail));
+    if (!staff || !(await verifyPassword(password, staff.passwordHash))) {
       res.status(401).json({ error: "Invalid credentials" });
       return;
     }
@@ -30,8 +33,8 @@ router.post("/auth/login", async (req, res): Promise<void> => {
   }
 
   if (role === "customer") {
-    const [customer] = await db.select().from(customersTable).where(eq(customersTable.email, email));
-    if (!customer || !verifyPassword(password, customer.passwordHash)) {
+    const [customer] = await db.select().from(customersTable).where(eq(customersTable.email, lookupEmail));
+    if (!customer || !(await verifyPassword(password, customer.passwordHash))) {
       res.status(401).json({ error: "Invalid credentials" });
       return;
     }

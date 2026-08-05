@@ -28,7 +28,7 @@ app.use(
 );
 // In production, restrict CORS to the explicit allow-list in CORS_ORIGIN
 // (comma-separated URLs).  In development, allow any origin for convenience.
-const corsOrigin: string | boolean =
+const corsOrigin: string | boolean | string[] =
   process.env.NODE_ENV === "production" && process.env.CORS_ORIGIN
     ? // support multiple comma-separated origins
       process.env.CORS_ORIGIN.split(",").map((s) => s.trim()).length === 1
