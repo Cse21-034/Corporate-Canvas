@@ -17,17 +17,29 @@ function sign(value: string): string {
   return createHmac("sha256", SECRET).update(value).digest("base64url");
 }
 
+// In production the API and the frontend are on different sites (Render vs
+// Vercel), so the cookie has to be SameSite=None or the browser won't send it
+// with cross-site requests. SameSite=None requires Secure.
+//
+// clearCookie has to repeat these exact attributes: a browser only drops a
+// cookie when the clearing header matches, and it rejects a cross-site write
+// that isn't SameSite=None with Secure. Sharing them here keeps the two in
+// step — when they drifted apart, logout silently did nothing.
+function cookieOptions() {
+  const isProduction = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? ("none" as const) : ("lax" as const),
+    path: "/",
+  };
+}
+
 export function setSession(res: Response, payload: SessionPayload): void {
   const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const sig = sign(encoded);
-  // In production the API and the frontend are on different sites (Render vs
-  // Vercel), so the cookie has to be SameSite=None or the browser won't send
-  // it with cross-site requests. SameSite=None requires Secure.
-  const isProduction = process.env.NODE_ENV === "production";
   res.cookie(COOKIE_NAME, `${encoded}.${sig}`, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    ...cookieOptions(),
     maxAge: MAX_AGE,
   });
 }
@@ -48,5 +60,5 @@ export function getSession(req: Request): SessionPayload | null {
 }
 
 export function clearSession(res: Response): void {
-  res.clearCookie(COOKIE_NAME);
+  res.clearCookie(COOKIE_NAME, cookieOptions());
 }
