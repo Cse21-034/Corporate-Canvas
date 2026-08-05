@@ -1,12 +1,41 @@
-import React from 'react';
-import { useListAdminQuoteRequests, useUpdateAdminQuoteRequest, getListAdminQuoteRequestsQueryKey, QuoteRequestUpdateStatus } from '@workspace/api-client-react';
-import { Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link } from 'wouter';
+import { useListAdminQuoteRequests, useUpdateAdminQuoteRequest, useConvertAdminQuoteRequest, getListAdminQuoteRequestsQueryKey, QuoteRequestUpdateStatus } from '@workspace/api-client-react';
+import { Loader2, Wand2, ArrowRight, X, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function QuoteRequests() {
   const { data: quotes, isLoading } = useListAdminQuoteRequests();
   const updateQuote = useUpdateAdminQuoteRequest();
+  const convertQuote = useConvertAdminQuoteRequest();
   const queryClient = useQueryClient();
+
+  const [convertingId, setConvertingId] = useState<number | null>(null);
+  const [result, setResult] = useState<
+    { company: string; projectId: number; createdCustomer: boolean; password?: string | null } | null
+  >(null);
+  const [convertError, setConvertError] = useState<string | null>(null);
+
+  const convert = (id: number, company: string) => {
+    setConvertingId(id);
+    setConvertError(null);
+    convertQuote.mutate({ id }, {
+      onSuccess: (res) => {
+        setConvertingId(null);
+        setResult({
+          company,
+          projectId: res.projectId,
+          createdCustomer: res.createdCustomer,
+          password: res.password,
+        });
+        queryClient.invalidateQueries({ queryKey: getListAdminQuoteRequestsQueryKey() });
+      },
+      onError: (err) => {
+        setConvertingId(null);
+        setConvertError(err instanceof Error ? err.message : 'Could not convert this quote.');
+      },
+    });
+  };
 
   const handleStatusChange = (id: number, newStatus: string) => {
     updateQuote.mutate({
@@ -41,6 +70,46 @@ export default function QuoteRequests() {
         <p className="text-muted-foreground">Manage incoming sales inquiries.</p>
       </div>
 
+      {result && (
+        <div className="rounded-xl border border-green-600/30 bg-green-50 p-5 dark:bg-green-900/20">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <p className="flex items-center gap-2 font-bold text-green-800 dark:text-green-300">
+                <Check className="h-4 w-4" /> {result.company} converted
+              </p>
+              <p className="text-sm text-green-900/80 dark:text-green-200/80">
+                {result.createdCustomer
+                  ? 'A client account and a project were created, with a milestone plan already filled in.'
+                  : 'That email already had an account, so the project was added to it. No new login was created.'}
+              </p>
+
+              {result.password && (
+                <div className="rounded-md border border-green-600/30 bg-background/60 p-3">
+                  <p className="text-xs font-semibold text-foreground">
+                    Send these to the client — the password is not recoverable afterwards.
+                  </p>
+                  <p className="mt-1 font-mono-label text-sm text-foreground">PASSWORD {result.password}</p>
+                </div>
+              )}
+
+              <Link
+                href="/admin/projects"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+              >
+                View project PRJ-{String(result.projectId).padStart(4, '0')} <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <button onClick={() => setResult(null)} aria-label="Dismiss" className="text-muted-foreground hover:text-foreground">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {convertError && (
+        <p className="rounded-md border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm font-medium text-destructive">{convertError}</p>
+      )}
+
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -51,6 +120,7 @@ export default function QuoteRequests() {
                 <th className="px-6 py-4 w-1/3">Message & Interests</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Date</th>
+                <th className="px-6 py-4">Convert</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -89,11 +159,31 @@ export default function QuoteRequests() {
                   <td className="px-6 py-4 align-top text-muted-foreground whitespace-nowrap">
                     {new Date(quote.createdAt).toLocaleDateString()}
                   </td>
+                  <td className="px-6 py-4 align-top whitespace-nowrap">
+                    {quote.projectId ? (
+                      <Link
+                        href="/admin/projects"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary"
+                      >
+                        <Check className="h-3.5 w-3.5" /> PRJ-{String(quote.projectId).padStart(4, '0')}
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => convert(quote.id, quote.company)}
+                        disabled={convertingId === quote.id}
+                        title="Create the client account and project from this enquiry"
+                        className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-70"
+                      >
+                        {convertingId === quote.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+                        Convert
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
               {!quotes?.length && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">No quote requests found.</td>
+                  <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">No quote requests found.</td>
                 </tr>
               )}
             </tbody>

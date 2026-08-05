@@ -28,6 +28,20 @@ export interface ServiceUpdate {
   imageUrl?: string | null;
 }
 
+export interface QuoteConversionResult {
+  customerId: number;
+  projectId: number;
+  /** False when the quote's email already belonged to a customer. */
+  createdCustomer: boolean;
+  /** True when this quote had been converted before. */
+  alreadyConverted: boolean;
+  /**
+     * Generated password, returned once and only for a newly created customer.
+     * @nullable
+     */
+  password?: string | null;
+}
+
 export interface ProjectDeleteResult {
   detachedTickets: number;
   detachedInvoices: number;
@@ -168,6 +182,10 @@ export interface QuoteRequest {
   industry?: string | null;
   message: string;
   status: QuoteRequestStatus;
+  /** @nullable */
+  customerId?: number | null;
+  /** @nullable */
+  projectId?: number | null;
   createdAt: string;
 }
 

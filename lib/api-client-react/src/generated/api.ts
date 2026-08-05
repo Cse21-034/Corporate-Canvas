@@ -39,6 +39,7 @@ import type {
   ProjectDeleteResult,
   ProjectInput,
   ProjectUpdate,
+  QuoteConversionResult,
   QuoteRequest,
   QuoteRequestInput,
   QuoteRequestUpdate,
@@ -2541,6 +2542,77 @@ export function useListAdminTickets<TData = Awaited<ReturnType<typeof listAdminT
 
 
 
+
+export const getConvertAdminQuoteRequestUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/quote-requests/${id}/convert`
+}
+
+/**
+ * @summary Turn a quote request into a customer and project in one step
+ */
+export const convertAdminQuoteRequest = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<QuoteConversionResult> => {
+
+  return customFetch<QuoteConversionResult>(getConvertAdminQuoteRequestUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getConvertAdminQuoteRequestMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof convertAdminQuoteRequest>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof convertAdminQuoteRequest>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['convertAdminQuoteRequest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof convertAdminQuoteRequest>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  convertAdminQuoteRequest(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConvertAdminQuoteRequestMutationResult = NonNullable<Awaited<ReturnType<typeof convertAdminQuoteRequest>>>
+
+    export type ConvertAdminQuoteRequestMutationError = ErrorType<void>
+
+    /**
+ * @summary Turn a quote request into a customer and project in one step
+ */
+export const useConvertAdminQuoteRequest = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof convertAdminQuoteRequest>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof convertAdminQuoteRequest>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getConvertAdminQuoteRequestMutationOptions(options));
+    }
 
 export const getGetAdminCustomerUrl = (id: number,) => {
 

@@ -18,5 +18,9 @@ export interface QuoteRequest {
   industry?: string | null;
   message: string;
   status: QuoteRequestStatus;
+  /** @nullable */
+  customerId?: number | null;
+  /** @nullable */
+  projectId?: number | null;
   createdAt: string;
 }

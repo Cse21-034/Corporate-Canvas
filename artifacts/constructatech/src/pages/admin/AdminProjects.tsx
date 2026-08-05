@@ -15,6 +15,29 @@ export default function AdminProjects() {
   const [rowError, setRowError] = useState<string | null>(null);
   const [detached, setDetached] = useState<string | null>(null);
 
+  // Milestone editing. Staff own the delivery plan; the portal shows it to
+  // customers read-only.
+  const [planningId, setPlanningId] = useState<number | null>(null);
+  const [plan, setPlan] = useState<Array<{ label: string; dueDate?: string | null; done: boolean }>>([]);
+
+  const openPlan = (id: number, milestones: Array<{ label: string; dueDate?: string | null; done: boolean }>) => {
+    setPlanningId(id);
+    setConfirmingId(null);
+    setRowError(null);
+    setPlan(milestones?.map((m) => ({ label: m.label, dueDate: m.dueDate ?? '', done: m.done })) ?? []);
+  };
+
+  const savePlan = (id: number) => {
+    const cleaned = plan
+      .filter((m) => m.label.trim() !== '')
+      .map((m) => ({ label: m.label.trim(), dueDate: m.dueDate ? m.dueDate : null, done: m.done }));
+    setRowError(null);
+    updateProject.mutate({ id, data: { milestones: cleaned } }, {
+      onSuccess: () => { setPlanningId(null); refreshProjects(); },
+      onError: (err) => setRowError(err instanceof Error ? err.message : 'Could not save the milestones.'),
+    });
+  };
+
   const refreshProjects = () => queryClient.invalidateQueries({ queryKey: getListAdminProjectsQueryKey() });
 
   const changeStatus = (id: number, status: string) => {
@@ -164,14 +187,84 @@ export default function AdminProjects() {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right">
                       <button
+                        onClick={() => (planningId === project.id ? setPlanningId(null) : openPlan(project.id, project.milestones ?? []))}
+                        className="rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                      >
+                        Milestones
+                      </button>
+                      <button
                         onClick={() => { setConfirmingId(project.id); setRowError(null); setDetached(null); }}
                         aria-label={`Delete ${project.title}`}
-                        className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        className="ml-1 rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
                   </tr>
+
+                  {planningId === project.id && (
+                    <tr>
+                      <td colSpan={6} className="bg-muted/20 px-6 py-5">
+                        <h3 className="mb-3 font-mono-label text-xs text-muted-foreground">DELIVERY PLAN</h3>
+
+                        <div className="space-y-2">
+                          {plan.map((m, idx) => (
+                            <div key={idx} className="flex flex-wrap items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={m.done}
+                                onChange={(e) => setPlan(plan.map((x, i) => (i === idx ? { ...x, done: e.target.checked } : x)))}
+                                aria-label={`Mark ${m.label || 'milestone'} complete`}
+                                className="h-4 w-4 shrink-0 accent-[hsl(var(--primary))]"
+                              />
+                              <input
+                                value={m.label}
+                                onChange={(e) => setPlan(plan.map((x, i) => (i === idx ? { ...x, label: e.target.value } : x)))}
+                                placeholder="Milestone"
+                                className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                              />
+                              <input
+                                type="date"
+                                value={m.dueDate ?? ''}
+                                onChange={(e) => setPlan(plan.map((x, i) => (i === idx ? { ...x, dueDate: e.target.value } : x)))}
+                                className="rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                              />
+                              <button
+                                onClick={() => setPlan(plan.filter((_, i) => i !== idx))}
+                                aria-label={`Remove ${m.label || 'milestone'}`}
+                                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                          {plan.length === 0 && (
+                            <p className="text-sm text-muted-foreground">No milestones yet. Add the first step below.</p>
+                          )}
+                        </div>
+
+                        {rowError && <p className="mt-3 text-sm font-medium text-destructive">{rowError}</p>}
+
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          <button
+                            onClick={() => setPlan([...plan, { label: '', dueDate: '', done: false }])}
+                            className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                          >
+                            <Plus className="h-4 w-4" /> Add milestone
+                          </button>
+                          <button
+                            onClick={() => savePlan(project.id)}
+                            disabled={updateProject.isPending}
+                            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-70"
+                          >
+                            {updateProject.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                            Save plan
+                          </button>
+                          <button onClick={() => setPlanningId(null)} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">Cancel</button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
 
                   {confirmingId === project.id && (
                     <tr>

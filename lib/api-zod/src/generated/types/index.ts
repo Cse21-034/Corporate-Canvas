@@ -37,6 +37,7 @@ export * from './projectInputStatus';
 export * from './projectStatus';
 export * from './projectUpdate';
 export * from './projectUpdateStatus';
+export * from './quoteConversionResult';
 export * from './quoteRequest';
 export * from './quoteRequestInput';
 export * from './quoteRequestStatus';

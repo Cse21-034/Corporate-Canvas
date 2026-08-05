@@ -679,6 +679,35 @@ paths:
         "401":
           description: Unauthorized
 
+  /admin/quote-requests/{id}/convert:
+    post:
+      operationId: convertAdminQuoteRequest
+      tags: [admin]
+      summary: Turn a quote request into a customer and project in one step
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Already converted; returns the existing links
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteConversionResult"
+        "201":
+          description: Converted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteConversionResult"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+
   /admin/customers/{id}:
     get:
       operationId: getAdminCustomer
@@ -881,6 +910,24 @@ components:
         imageUrl:
           type: ["string", "null"]
 
+    QuoteConversionResult:
+      type: object
+      required: [customerId, projectId, createdCustomer, alreadyConverted]
+      properties:
+        customerId:
+          type: number
+        projectId:
+          type: number
+        createdCustomer:
+          type: boolean
+          description: False when the quote's email already belonged to a customer.
+        alreadyConverted:
+          type: boolean
+          description: True when this quote had been converted before.
+        password:
+          type: ["string", "null"]
+          description: Generated password, returned once and only for a newly created customer.
+
     ProjectDeleteResult:
       type: object
       required: [detachedTickets, detachedInvoices]
@@ -1033,6 +1080,10 @@ components:
         status:
           type: string
           enum: [new, contacted, quoted, won, lost]
+        customerId:
+          type: ["number", "null"]
+        projectId:
+          type: ["number", "null"]
         createdAt:
           type: string
 

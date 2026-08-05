@@ -107,6 +107,8 @@ export const SubmitQuoteRequestResponse = zod.object({
   "industry": zod.string().nullish(),
   "message": zod.string(),
   "status": zod.enum(['new', 'contacted', 'quoted', 'won', 'lost']),
+  "customerId": zod.number().nullish(),
+  "projectId": zod.number().nullish(),
   "createdAt": zod.string()
 })
 
@@ -386,6 +388,8 @@ export const ListAdminQuoteRequestsResponseItem = zod.object({
   "industry": zod.string().nullish(),
   "message": zod.string(),
   "status": zod.enum(['new', 'contacted', 'quoted', 'won', 'lost']),
+  "customerId": zod.number().nullish(),
+  "projectId": zod.number().nullish(),
   "createdAt": zod.string()
 })
 export const ListAdminQuoteRequestsResponse = zod.array(ListAdminQuoteRequestsResponseItem)
@@ -412,6 +416,8 @@ export const UpdateAdminQuoteRequestResponse = zod.object({
   "industry": zod.string().nullish(),
   "message": zod.string(),
   "status": zod.enum(['new', 'contacted', 'quoted', 'won', 'lost']),
+  "customerId": zod.number().nullish(),
+  "projectId": zod.number().nullish(),
   "createdAt": zod.string()
 })
 
@@ -703,6 +709,22 @@ export const ListAdminTicketsResponseItem = zod.object({
   "createdAt": zod.string()
 })
 export const ListAdminTicketsResponse = zod.array(ListAdminTicketsResponseItem)
+
+
+/**
+ * @summary Turn a quote request into a customer and project in one step
+ */
+export const ConvertAdminQuoteRequestParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ConvertAdminQuoteRequestResponse = zod.object({
+  "customerId": zod.number(),
+  "projectId": zod.number(),
+  "createdCustomer": zod.boolean().describe('False when the quote\'s email already belonged to a customer.'),
+  "alreadyConverted": zod.boolean().describe('True when this quote had been converted before.'),
+  "password": zod.string().nullish().describe('Generated password, returned once and only for a newly created customer.')
+})
 
 
 /**

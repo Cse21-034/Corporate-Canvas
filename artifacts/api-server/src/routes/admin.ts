@@ -3,6 +3,7 @@ import { eq, desc } from "drizzle-orm";
 import { db, quoteRequestsTable, customersTable, projectsTable, ticketsTable, invoicesTable, servicesTable } from "@workspace/db";
 import { getSession } from "../lib/session";
 import { hashPassword } from "../lib/auth";
+import { buildMilestones } from "../lib/milestone-templates";
 
 const router: IRouter = Router();
 
@@ -112,6 +113,101 @@ router.post("/admin/customers", requireStaff, async (req, res): Promise<void> =>
     phone: record.phone,
     status: record.status,
     createdAt: record.createdAt.toISOString(),
+  });
+});
+
+router.post("/admin/quote-requests/:id/convert", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+
+  const [quote] = await db.select().from(quoteRequestsTable).where(eq(quoteRequestsTable.id, id));
+  if (!quote) {
+    res.status(404).json({ error: "Quote request not found" });
+    return;
+  }
+
+  // Already converted: hand back what exists rather than creating a second
+  // customer and project on a double click.
+  if (quote.projectId) {
+    res.status(200).json({
+      customerId: quote.customerId,
+      projectId: quote.projectId,
+      createdCustomer: false,
+      alreadyConverted: true,
+      password: null,
+    });
+    return;
+  }
+
+  const email = quote.email.trim().toLowerCase();
+  const [existing] = await db.select().from(customersTable).where(eq(customersTable.email, email));
+
+  let customerId: number;
+  let createdCustomer = false;
+  let password: string | null = null;
+
+  if (existing) {
+    customerId = existing.id;
+  } else {
+    // Readable generated password — ambiguous characters left out so it can be
+    // dictated over the phone without confusion.
+    const alphabet = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    password = Array.from({ length: 12 }, () =>
+      alphabet[Math.floor(Math.random() * alphabet.length)],
+    ).join("");
+
+    const [created] = await db
+      .insert(customersTable)
+      .values({
+        companyName: quote.company.trim(),
+        contactName: quote.name.trim(),
+        email,
+        phone: quote.phone.trim(),
+        passwordHash: await hashPassword(password),
+        status: "active",
+      })
+      .returning();
+    customerId = created.id;
+    createdCustomer = true;
+  }
+
+  const startDate = new Date().toISOString().slice(0, 10);
+  const services = (quote.serviceInterest ?? []).filter(Boolean);
+  const title = services.length
+    ? `${services.join(", ")} — ${quote.company.trim()}`
+    : `New engagement — ${quote.company.trim()}`;
+
+  const descriptionParts = [quote.message?.trim()].filter(Boolean) as string[];
+  if (quote.industry) descriptionParts.push(`Industry: ${quote.industry}`);
+  if (services.length) descriptionParts.push(`Services requested: ${services.join(", ")}`);
+
+  const milestones = buildMilestones(services, startDate);
+
+  const [project] = await db
+    .insert(projectsTable)
+    .values({
+      title,
+      description: descriptionParts.join("\n\n") || "Converted from a quote request.",
+      status: "scoping",
+      customerId,
+      milestones,
+      startDate,
+      targetDate: milestones.length ? milestones[milestones.length - 1].dueDate : null,
+    })
+    .returning();
+
+  await db
+    .update(quoteRequestsTable)
+    .set({ status: "won", customerId, projectId: project.id })
+    .where(eq(quoteRequestsTable.id, id));
+
+  res.status(201).json({
+    customerId,
+    projectId: project.id,
+    createdCustomer,
+    alreadyConverted: false,
+    // Shown once. With no mail server this is the only chance to capture it.
+    password,
   });
 });
 

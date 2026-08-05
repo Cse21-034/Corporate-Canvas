@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -12,6 +12,11 @@ export const quoteRequestsTable = pgTable("quote_requests", {
   industry: text("industry"),
   message: text("message").notNull(),
   status: text("status").notNull().default("new"), // new | contacted | quoted | won | lost
+  // Set when the quote is converted. They make the conversion repeat-safe —
+  // a second click links to what already exists instead of creating a
+  // duplicate customer and project.
+  customerId: integer("customer_id"),
+  projectId: integer("project_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
