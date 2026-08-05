@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'wouter';
 import { useListAdminTickets } from '@workspace/api-client-react';
 import { Loader2 } from 'lucide-react';
 
@@ -51,7 +52,9 @@ export default function AdminTickets() {
               {tickets?.map((ticket) => (
                 <tr key={ticket.id} className="hover:bg-muted/30 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-foreground mb-1">{ticket.subject}</div>
+                    <Link href={`/admin/tickets/${ticket.id}`} className="font-medium text-foreground mb-1 block hover:text-primary transition-colors">
+                      {ticket.subject}
+                    </Link>
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground font-mono-label">TKT-{ticket.id.toString().padStart(4, '0')}</span>
                       <span className="text-[10px] font-bold text-muted-foreground uppercase bg-muted px-1.5 py-0.5 rounded">{ticket.type.replace('-', ' ')}</span>

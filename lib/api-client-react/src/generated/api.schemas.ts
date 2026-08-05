@@ -28,6 +28,31 @@ export interface ServiceUpdate {
   imageUrl?: string | null;
 }
 
+export type TicketUpdateStatus = typeof TicketUpdateStatus[keyof typeof TicketUpdateStatus];
+
+
+export const TicketUpdateStatus = {
+  open: 'open',
+  'in-progress': 'in-progress',
+  resolved: 'resolved',
+  closed: 'closed',
+} as const;
+
+export type TicketUpdatePriority = typeof TicketUpdatePriority[keyof typeof TicketUpdatePriority];
+
+
+export const TicketUpdatePriority = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  urgent: 'urgent',
+} as const;
+
+export interface TicketUpdate {
+  status?: TicketUpdateStatus;
+  priority?: TicketUpdatePriority;
+}
+
 export interface Industry {
   id: number;
   slug: string;

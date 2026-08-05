@@ -32,6 +32,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import QuoteRequests from './pages/admin/QuoteRequests';
 import Customers from './pages/admin/Customers';
 import AdminServices from './pages/admin/Services';
+import AdminTicketDetail from './pages/admin/AdminTicketDetail';
 import AdminProjects from './pages/admin/AdminProjects';
 import AdminTickets from './pages/admin/AdminTickets';
 import AdminInvoices from './pages/admin/AdminInvoices';
@@ -66,6 +67,7 @@ function Router() {
       <Route path="/admin/tickets" component={() => <AdminGuard><AdminLayout><AdminTickets /></AdminLayout></AdminGuard>} />
       <Route path="/admin/invoices" component={() => <AdminGuard><AdminLayout><AdminInvoices /></AdminLayout></AdminGuard>} />
       <Route path="/admin/services" component={() => <AdminGuard><AdminLayout><AdminServices /></AdminLayout></AdminGuard>} />
+      <Route path="/admin/tickets/:id" component={() => <AdminGuard><AdminLayout><AdminTicketDetail /></AdminLayout></AdminGuard>} />
 
       {/* 404 */}
       <Route component={NotFound} />

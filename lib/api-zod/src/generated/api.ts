@@ -553,6 +553,98 @@ export const UpdateAdminProjectResponse = zod.object({
 
 
 /**
+ * @summary Get a ticket with its message thread
+ */
+export const GetAdminTicketParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminTicketResponse = zod.object({
+  "id": zod.number(),
+  "subject": zod.string(),
+  "type": zod.enum(['support', 'change-request']),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']),
+  "status": zod.enum(['open', 'in-progress', 'resolved', 'closed']),
+  "customerId": zod.number(),
+  "customerName": zod.string().nullish(),
+  "projectId": zod.number().nullish(),
+  "messages": zod.array(zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
+  "createdAt": zod.string()
+})),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Update a ticket's status or priority
+ */
+export const UpdateAdminTicketParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminTicketBody = zod.object({
+  "status": zod.enum(['open', 'in-progress', 'resolved', 'closed']).optional(),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']).optional()
+})
+
+export const UpdateAdminTicketResponse = zod.object({
+  "id": zod.number(),
+  "subject": zod.string(),
+  "type": zod.enum(['support', 'change-request']),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']),
+  "status": zod.enum(['open', 'in-progress', 'resolved', 'closed']),
+  "customerId": zod.number(),
+  "customerName": zod.string().nullish(),
+  "projectId": zod.number().nullish(),
+  "messages": zod.array(zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
+  "createdAt": zod.string()
+})),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a ticket
+ */
+export const DeleteAdminTicketParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAdminTicketResponse = zod.void()
+
+
+/**
+ * @summary Reply to a ticket as staff
+ */
+export const CreateAdminTicketMessageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const CreateAdminTicketMessageBody = zod.object({
+  "body": zod.string().min(1)
+})
+
+export const CreateAdminTicketMessageResponse = zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
+  "createdAt": zod.string()
+})
+
+
+/**
  * @summary Update a service
  */
 export const UpdateAdminServiceParams = zod.object({

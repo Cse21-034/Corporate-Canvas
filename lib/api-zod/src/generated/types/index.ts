@@ -46,3 +46,6 @@ export * from './ticketMessageInput';
 export * from './ticketPriority';
 export * from './ticketStatus';
 export * from './ticketType';
+export * from './ticketUpdate';
+export * from './ticketUpdatePriority';
+export * from './ticketUpdateStatus';

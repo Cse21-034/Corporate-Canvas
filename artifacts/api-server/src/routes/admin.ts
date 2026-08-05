@@ -187,6 +187,84 @@ router.get("/admin/tickets", requireStaff, async (_req, res): Promise<void> => {
   res.json(tickets.map(t => ({ ...t, createdAt: t.createdAt.toISOString() })));
 });
 
+router.get("/admin/tickets/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const [ticket] = await db.select().from(ticketsTable).where(eq(ticketsTable.id, id));
+  if (!ticket) {
+    res.status(404).json({ error: "Ticket not found" });
+    return;
+  }
+  const [customer] = await db.select().from(customersTable).where(eq(customersTable.id, ticket.customerId));
+  res.json({
+    ...ticket,
+    customerName: customer?.companyName ?? null,
+    createdAt: ticket.createdAt.toISOString(),
+  });
+});
+
+router.patch("/admin/tickets/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const { status, priority } = req.body;
+
+  const patch: Record<string, string> = {};
+  if (status !== undefined) patch["status"] = status;
+  if (priority !== undefined) patch["priority"] = priority;
+  if (Object.keys(patch).length === 0) {
+    res.status(400).json({ error: "status or priority is required" });
+    return;
+  }
+
+  const [record] = await db.update(ticketsTable).set(patch).where(eq(ticketsTable.id, id)).returning();
+  if (!record) {
+    res.status(404).json({ error: "Ticket not found" });
+    return;
+  }
+  res.json({ ...record, createdAt: record.createdAt.toISOString() });
+});
+
+router.post("/admin/tickets/:id/messages", requireStaff, async (req: any, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const { body } = req.body;
+  if (!body || String(body).trim() === "") {
+    res.status(400).json({ error: "body is required" });
+    return;
+  }
+
+  const [ticket] = await db.select().from(ticketsTable).where(eq(ticketsTable.id, id));
+  if (!ticket) {
+    res.status(404).json({ error: "Ticket not found" });
+    return;
+  }
+
+  // Messages live in a jsonb column, so a reply appends to the array. isStaff
+  // is what the portal uses to align and label the message as coming from us.
+  const msgs = (ticket.messages as any[]) || [];
+  const newMsg = {
+    id: msgs.length + 1,
+    author: req.session.name,
+    body: String(body).trim(),
+    isStaff: true,
+    createdAt: new Date().toISOString(),
+  };
+  msgs.push(newMsg);
+  await db.update(ticketsTable).set({ messages: msgs }).where(eq(ticketsTable.id, id));
+  res.status(201).json(newMsg);
+});
+
+router.delete("/admin/tickets/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const [record] = await db.delete(ticketsTable).where(eq(ticketsTable.id, id)).returning();
+  if (!record) {
+    res.status(404).json({ error: "Ticket not found" });
+    return;
+  }
+  res.sendStatus(204);
+});
+
 router.get("/admin/invoices", requireStaff, async (_req, res): Promise<void> => {
   const invoices = await db.select({
     id: invoicesTable.id,
