@@ -45,7 +45,21 @@ export default function SolutionDetail() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-foreground text-white relative">
+      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-foreground text-white relative overflow-hidden">
+        {service.imageUrl && (
+          /* Sits behind the copy. The overlay keeps the headline and body text
+             above 4.5:1 no matter how bright the photograph is. */
+          <div className="absolute inset-0" aria-hidden="true">
+            <img
+              src={service.imageUrl}
+              alt=""
+              className="h-full w-full object-cover"
+              decoding="async"
+            />
+            <div className="absolute inset-0 bg-foreground/85" />
+            <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/80 to-foreground/40" />
+          </div>
+        )}
         <div className="container mx-auto px-5 md:px-6 relative z-10">
           <Link
             href="/solutions"
@@ -53,7 +67,7 @@ export default function SolutionDetail() {
           >
             <ArrowLeft className="w-4 h-4" /> Back to Solutions
           </Link>
-          <span className="font-mono-label text-primary mb-4 block">SOLUTION SPECIFICATION</span>
+          <span className="font-mono-label text-primary-on-dark mb-4 block">SOLUTION SPECIFICATION</span>
           <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl mb-5 md:mb-6">
             {service.title}
           </h1>

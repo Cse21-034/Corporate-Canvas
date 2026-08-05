@@ -31,6 +31,7 @@ import Account from './pages/portal/Account';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import QuoteRequests from './pages/admin/QuoteRequests';
 import Customers from './pages/admin/Customers';
+import AdminServices from './pages/admin/Services';
 import AdminProjects from './pages/admin/AdminProjects';
 import AdminTickets from './pages/admin/AdminTickets';
 import AdminInvoices from './pages/admin/AdminInvoices';
@@ -64,6 +65,7 @@ function Router() {
       <Route path="/admin/projects" component={() => <AdminGuard><AdminLayout><AdminProjects /></AdminLayout></AdminGuard>} />
       <Route path="/admin/tickets" component={() => <AdminGuard><AdminLayout><AdminTickets /></AdminLayout></AdminGuard>} />
       <Route path="/admin/invoices" component={() => <AdminGuard><AdminLayout><AdminInvoices /></AdminLayout></AdminGuard>} />
+      <Route path="/admin/services" component={() => <AdminGuard><AdminLayout><AdminServices /></AdminLayout></AdminGuard>} />
 
       {/* 404 */}
       <Route component={NotFound} />

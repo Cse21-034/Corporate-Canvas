@@ -147,7 +147,7 @@ export function Header() {
           <Link
             href="/contact"
             onClick={closeMenu}
-            className="block w-full bg-primary hover:bg-primary/90 text-primary-foreground text-center px-8 py-4 rounded-md font-bold text-lg transition-all shadow-[0_4px_20px_rgba(242,106,75,0.4)]"
+            className="block w-full bg-primary hover:bg-primary/90 text-primary-foreground text-center px-8 py-4 rounded-md font-bold text-lg transition-all shadow-[0_4px_20px_rgba(201,63,13,0.4)]"
           >
             Request a Quote
           </Link>

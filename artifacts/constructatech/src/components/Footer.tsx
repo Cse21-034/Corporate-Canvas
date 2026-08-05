@@ -23,11 +23,11 @@ export function Footer() {
             <div>
               <h3 className="font-mono-label mb-4 md:mb-6 text-white text-xs">NAVIGATION</h3>
               <ul className="space-y-3 md:space-y-4 text-sm text-sidebar-foreground/70">
-                <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-                <li><Link href="/solutions" className="hover:text-primary transition-colors">Solutions</Link></li>
-                <li><Link href="/industries" className="hover:text-primary transition-colors">Industries</Link></li>
-                <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
-                <li><Link href="/portal/login" className="hover:text-primary transition-colors">Client Portal</Link></li>
+                <li><Link href="/about" className="hover:text-sidebar-primary transition-colors">About Us</Link></li>
+                <li><Link href="/solutions" className="hover:text-sidebar-primary transition-colors">Solutions</Link></li>
+                <li><Link href="/industries" className="hover:text-sidebar-primary transition-colors">Industries</Link></li>
+                <li><Link href="/contact" className="hover:text-sidebar-primary transition-colors">Contact</Link></li>
+                <li><Link href="/portal/login" className="hover:text-sidebar-primary transition-colors">Client Portal</Link></li>
               </ul>
             </div>
 
@@ -35,12 +35,12 @@ export function Footer() {
               <h3 className="font-mono-label mb-4 md:mb-6 text-white text-xs">CONTACT</h3>
               <ul className="space-y-3 md:space-y-4 text-sm text-sidebar-foreground/70">
                 <li>
-                  <a href="tel:+26774259012" className="hover:text-primary transition-colors">
+                  <a href="tel:+26774259012" className="hover:text-sidebar-primary transition-colors">
                     +267 74 259 012
                   </a>
                 </li>
                 <li>
-                  <a href="mailto:info@constructech.co.bw" className="hover:text-primary transition-colors break-all">
+                  <a href="mailto:info@constructech.co.bw" className="hover:text-sidebar-primary transition-colors break-all">
                     info@constructech.co.bw
                   </a>
                 </li>
@@ -60,7 +60,7 @@ export function Footer() {
             <span className="font-display font-bold text-white tracking-tight">DELL</span>
             <span className="font-display font-bold text-white italic">HP</span>
             <span className="font-display font-bold text-white tracking-widest">CISCO</span>
-            <span className="font-display font-bold text-primary">UBIQUITI</span>
+            <span className="font-display font-bold text-sidebar-primary">UBIQUITI</span>
             <span className="font-display font-bold text-red-500">HIKVISION</span>
           </div>
         </div>

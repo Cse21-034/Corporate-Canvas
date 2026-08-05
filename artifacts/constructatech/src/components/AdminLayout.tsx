@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Logo } from './Logo';
-import { LayoutDashboard, FileText, Users, FolderKanban, MessageSquare, Receipt, LogOut, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, FolderKanban, MessageSquare, Receipt, LogOut, ArrowLeft, Wrench } from 'lucide-react';
 import { useLogout } from '@workspace/api-client-react';
 
 export function AdminLayout({ children }: { children: ReactNode }) {
@@ -15,6 +15,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     { href: '/admin/projects', label: 'Projects', icon: FolderKanban },
     { href: '/admin/tickets', label: 'Tickets', icon: MessageSquare },
     { href: '/admin/invoices', label: 'Invoices', icon: Receipt },
+    { href: '/admin/services', label: 'Services', icon: Wrench },
   ];
 
   const handleLogout = () => {
@@ -34,7 +35,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             <Logo variant="light" size="sm" />
           </Link>
           <div className="mt-4 px-2 flex items-center justify-between">
-            <span className="font-mono-label text-primary">Admin Access</span>
+            <span className="font-mono-label text-sidebar-primary">Admin Access</span>
           </div>
         </div>
         
@@ -83,7 +84,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         <div className="md:hidden bg-sidebar p-4 flex items-center justify-between sticky top-0 z-20">
           <div className="flex items-center gap-2">
             <Logo variant="light" size="sm" />
-            <span className="bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded font-bold ml-2">ADMIN</span>
+            <span className="bg-primary/20 text-sidebar-primary text-[10px] px-2 py-0.5 rounded font-bold ml-2">ADMIN</span>
           </div>
           <button onClick={handleLogout} className="text-sidebar-foreground/70 hover:text-white">
             <LogOut className="w-5 h-5" />
@@ -106,7 +107,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               key={item.href} 
               href={item.href}
               className={`flex flex-col items-center justify-center p-2 min-w-[64px] ${
-                isActive ? 'text-primary' : 'text-sidebar-foreground/70'
+                isActive ? 'text-sidebar-primary' : 'text-sidebar-foreground/70'
               }`}
             >
               <Icon className="w-6 h-6 mb-1" />

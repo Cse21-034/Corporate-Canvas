@@ -97,7 +97,7 @@ export function PortalLayout({ children }: { children: ReactNode }) {
               key={item.href} 
               href={item.href}
               className={`flex flex-col items-center justify-center p-2 min-w-[64px] ${
-                isActive ? 'text-primary' : 'text-sidebar-foreground/70'
+                isActive ? 'text-sidebar-primary' : 'text-sidebar-foreground/70'
               }`}
             >
               <Icon className="w-6 h-6 mb-1" />

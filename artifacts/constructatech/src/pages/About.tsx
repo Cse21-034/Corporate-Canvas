@@ -11,7 +11,7 @@ export default function About() {
       {/* Hero */}
       <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-foreground text-white relative">
         <div className="container mx-auto px-5 md:px-6 relative z-10">
-          <span className="font-mono-label text-primary mb-4 block">OUR STORY</span>
+          <span className="font-mono-label text-primary-on-dark mb-4 block">OUR STORY</span>
           <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-6xl max-w-3xl mb-5 md:mb-6">
             About Constructatech Ventures
           </h1>

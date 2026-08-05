@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'wouter';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
+import { Reveal } from '../components/Reveal';
+import { PartnerLogos } from '../components/PartnerLogos';
 import { ArrowRight, CheckCircle2, ChevronRight, Activity, Users, Calendar, Settings } from 'lucide-react';
 import { useListServices, useListIndustries, useGetStats } from '@workspace/api-client-react';
 
@@ -13,6 +15,10 @@ function CanvasNetworkGraph() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // A perpetually moving background is exactly what "reduce motion" is
+    // meant to suppress, and CSS alone cannot stop a rAF loop.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -98,7 +104,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto md:mx-0">
             <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white leading-[1.1] tracking-tight mb-5 md:mb-6 animate-in slide-in-from-bottom-8 duration-700">
               Empowering Botswana Through{' '}
-              <span className="text-primary">Smart Infrastructure</span>
+              <span className="text-primary-on-dark">Smart Infrastructure</span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-white/70 max-w-2xl mb-8 md:mb-10 animate-in slide-in-from-bottom-8 duration-700 delay-150">
               We don't just install hardware; we build the digital backbone for your success. Precision engineering for enterprise networks, data centers, and security systems.
@@ -106,7 +112,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-in slide-in-from-bottom-8 duration-700 delay-300">
               <Link
                 href="/contact"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-md font-semibold text-base md:text-lg transition-all hover:-translate-y-1 shadow-[0_4px_20px_rgba(242,106,75,0.4)] text-center"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-md font-semibold text-base md:text-lg transition-all hover:-translate-y-1 shadow-[0_4px_20px_rgba(201,63,13,0.4)] text-center"
               >
                 Request a Quote
               </Link>
@@ -159,35 +165,53 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
-            {services?.slice(0, 4).map((service) => (
+            {services?.slice(0, 4).map((service, cardIdx) => (
+              <Reveal key={service.id} delay={cardIdx * 0.08} className="flex">
               <Link
-                key={service.id}
                 href={`/solutions/${service.slug}`}
-                className="group bg-card rounded-xl border border-border p-6 md:p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col"
+                className="group bg-card rounded-xl border border-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col w-full"
               >
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top duration-300" />
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top duration-300 z-10" />
 
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-muted rounded-lg flex items-center justify-center mb-5 md:mb-6 group-hover:bg-primary/10 transition-colors shrink-0">
-                  <Activity className="w-6 h-6 md:w-7 md:h-7 text-primary" />
-                </div>
+                {service.imageUrl && (
+                  /* Fixed aspect ratio reserves the space before the image
+                     arrives, so the card never shifts the page as it loads. */
+                  <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+                    <img
+                      src={service.imageUrl}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card/70 via-card/10 to-transparent" />
+                  </div>
+                )}
 
-                <h3 className="font-display font-bold text-xl md:text-2xl text-card-foreground mb-3 md:mb-4">{service.title}</h3>
-                <p className="text-muted-foreground mb-5 md:mb-8 flex-grow text-sm md:text-base">{service.summary}</p>
+                <div className="flex flex-col flex-grow p-6 md:p-8">
+                  <div className="w-12 h-12 md:w-14 md:h-14 bg-muted rounded-lg flex items-center justify-center mb-5 md:mb-6 group-hover:bg-primary/10 transition-colors shrink-0">
+                    <Activity className="w-6 h-6 md:w-7 md:h-7 text-primary" />
+                  </div>
 
-                <div className="space-y-2 md:space-y-3 mb-5 md:mb-8">
-                  {service.includes.slice(0, 3).map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0 mt-0.5" />
-                      <span className="text-xs md:text-sm font-medium text-card-foreground/80">{item}</span>
-                    </div>
-                  ))}
-                </div>
+                  <h3 className="font-display font-bold text-xl md:text-2xl text-card-foreground mb-3 md:mb-4">{service.title}</h3>
+                  <p className="text-muted-foreground mb-5 md:mb-8 flex-grow text-sm md:text-base">{service.summary}</p>
 
-                <div className="mt-auto flex items-center text-primary font-medium text-sm group-hover:gap-2 transition-all pt-4 md:pt-0 border-t border-border md:border-0">
-                  View Specifications
-                  <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                  <div className="space-y-2 md:space-y-3 mb-5 md:mb-8">
+                    {service.includes.slice(0, 3).map((item, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0 mt-0.5" />
+                        <span className="text-xs md:text-sm font-medium text-card-foreground/80">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-auto flex items-center text-primary font-medium text-sm group-hover:gap-2 transition-all pt-4 md:pt-0 border-t border-border md:border-0">
+                    View Specifications
+                    <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                  </div>
                 </div>
               </Link>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -222,13 +246,7 @@ export default function Home() {
       <section className="py-12 md:py-16 bg-white border-y border-border">
         <div className="container mx-auto px-5 md:px-6 text-center">
           <span className="font-mono-label text-muted-foreground mb-6 md:mb-8 block text-xs">OUR TECHNOLOGY PARTNERS</span>
-          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-16">
-            <div className="px-5 py-2.5 border border-blue-500/20 bg-blue-50/50 rounded-full font-display font-bold text-blue-700 tracking-tight text-lg md:text-xl">DELL</div>
-            <div className="px-5 py-2.5 border border-blue-600/20 bg-blue-50/50 rounded-full font-display font-bold text-blue-800 italic text-lg md:text-xl">HP</div>
-            <div className="px-5 py-2.5 border border-sky-500/20 bg-sky-50/50 rounded-full font-display font-bold text-sky-600 tracking-widest text-lg md:text-xl">CISCO</div>
-            <div className="px-5 py-2.5 border border-orange-500/20 bg-orange-50/50 rounded-full font-display font-bold text-orange-600 text-lg md:text-xl">UBIQUITI</div>
-            <div className="px-5 py-2.5 border border-red-500/20 bg-red-50/50 rounded-full font-display font-bold text-red-600 text-lg md:text-xl">HIKVISION</div>
-          </div>
+          <PartnerLogos />
         </div>
       </section>
 
@@ -245,7 +263,7 @@ export default function Home() {
               { sw: 'Tirelo', en: 'SERVICE EXCELLENCE', desc: 'Uncompromising support and maintenance standards for every client, big or small.' },
             ].map(({ sw, en, desc }) => (
               <div key={sw} className="text-center px-2 sm:px-4">
-                <h3 className="font-display font-bold text-2xl md:text-3xl text-primary mb-1 md:mb-2">{sw}</h3>
+                <h3 className="font-display font-bold text-2xl md:text-3xl text-primary-on-dark mb-1 md:mb-2">{sw}</h3>
                 <p className="font-mono-label text-white/50 mb-3 md:mb-4 text-xs">{en}</p>
                 <p className="text-white/70 text-sm md:text-base">{desc}</p>
               </div>
