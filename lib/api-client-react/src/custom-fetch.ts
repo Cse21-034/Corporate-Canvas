@@ -360,7 +360,16 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, { ...init, method, headers });
+  // `credentials` defaults to "same-origin", which drops the session cookie
+  // whenever the API is on another origin — the browser refuses to store the
+  // Set-Cookie and never sends it back, so every authenticated call 401s.
+  // Callers can still override this explicitly.
+  const response = await fetch(input, {
+    credentials: "include",
+    ...init,
+    method,
+    headers,
+  });
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
