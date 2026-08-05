@@ -24,7 +24,12 @@ export function Header() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileMenuOpen]);
 
-  const isDarkHero = location === '/' || location === '/about' || location.startsWith('/solutions/');
+  // Pages whose hero sits on a dark background, so the unscrolled header
+  // needs light text. Nested routes (e.g. /solutions/:slug) match too.
+  const darkHeroPaths = ['/', '/about', '/solutions', '/industries', '/contact'];
+  const isDarkHero = darkHeroPaths.some(
+    (path) => location === path || (path !== '/' && location.startsWith(`${path}/`)),
+  );
   const useLightText = isDarkHero && !isScrolled && !mobileMenuOpen;
 
   const navLinks = [
