@@ -1,66 +1,39 @@
 import React from 'react';
 
+/**
+ * The supplied artwork is a full lockup — wordmark on the left, spectrum mark
+ * on the right — on a transparent background.
+ *
+ * Its wordmark is dark grey, which disappears against the navy heroes and
+ * sidebars, so `logo-light.png` is a generated variant with the neutral
+ * (wordmark) pixels turned white and the coloured mark left alone.
+ */
+const LOGO_DARK_TEXT = '/logo.png';
+const LOGO_LIGHT_TEXT = '/logo-light.png';
+
+// Source artwork is 1080x435, so height drives the size and width follows.
+const SIZE_CLASSES = {
+  sm: 'h-8',
+  md: 'h-10',
+  lg: 'h-14',
+} as const;
+
 interface LogoProps {
+  /** `light`/`mono` are used on dark backgrounds. */
   variant?: 'full' | 'light' | 'mono';
   size?: 'sm' | 'md' | 'lg';
 }
 
 export function Logo({ variant = 'full', size = 'md' }: LogoProps) {
-  const sizeClasses = {
-    sm: {
-      svg: 'w-6 h-6',
-      wordmark: 'text-lg',
-      sub: 'text-[8px]',
-    },
-    md: {
-      svg: 'w-8 h-8',
-      wordmark: 'text-xl',
-      sub: 'text-[10px]',
-    },
-    lg: {
-      svg: 'w-12 h-12',
-      wordmark: 'text-3xl',
-      sub: 'text-xs',
-    }
-  };
+  const onDarkBackground = variant === 'light' || variant === 'mono';
 
-  const isLightText = variant === 'light' || variant === 'mono';
-  
   return (
-    <div className="flex items-center gap-3">
-      <svg
-        className={`flex-shrink-0 ${sizeClasses[size].svg}`}
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <linearGradient id="spectrumGradient" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#3DBB4E" />
-            <stop offset="25%" stopColor="#9BCB3C" />
-            <stop offset="50%" stopColor="#F5A623" />
-            <stop offset="75%" stopColor="#C4267D" />
-            <stop offset="100%" stopColor="#6A2C91" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
-          fill={variant === 'mono' ? 'currentColor' : 'url(#spectrumGradient)'}
-          className={variant === 'mono' ? 'text-white' : ''}
-        />
-      </svg>
-      <div className="flex flex-col justify-center">
-        <span 
-          className={`font-display font-bold tracking-widest leading-none ${sizeClasses[size].wordmark} ${isLightText ? 'text-white' : 'text-foreground'}`}
-        >
-          CONSTRUCTATECH
-        </span>
-        <span 
-          className={`font-mono-label leading-none mt-1 ${sizeClasses[size].sub} ${isLightText ? 'text-white/70' : 'text-muted-foreground'}`}
-        >
-          VENTURES
-        </span>
-      </div>
-    </div>
+    <img
+      src={onDarkBackground ? LOGO_LIGHT_TEXT : LOGO_DARK_TEXT}
+      alt="Constructatech Ventures"
+      width={1080}
+      height={435}
+      className={`${SIZE_CLASSES[size]} w-auto object-contain`}
+    />
   );
 }
