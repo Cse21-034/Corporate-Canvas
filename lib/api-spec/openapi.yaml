@@ -515,6 +515,27 @@ paths:
                 $ref: "#/components/schemas/Project"
         "401":
           description: Unauthorized
+    delete:
+      operationId: deleteAdminProject
+      tags: [admin]
+      summary: Delete a project, detaching its tickets and invoices
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectDeleteResult"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
 
   /admin/tickets/{id}:
     get:
@@ -658,6 +679,79 @@ paths:
         "401":
           description: Unauthorized
 
+  /admin/customers/{id}:
+    get:
+      operationId: getAdminCustomer
+      tags: [admin]
+      summary: Get a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    patch:
+      operationId: updateAdminCustomer
+      tags: [admin]
+      summary: Update a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+        "409":
+          description: Email already in use
+    delete:
+      operationId: deleteAdminCustomer
+      tags: [admin]
+      summary: Delete a customer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+        "409":
+          description: Customer still has projects, tickets or invoices
+
   /admin/invoices:
     get:
       operationId: listAdminInvoices
@@ -674,6 +768,77 @@ paths:
                   $ref: "#/components/schemas/Invoice"
         "401":
           description: Unauthorized
+    post:
+      operationId: createAdminInvoice
+      tags: [admin]
+      summary: Create an invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "409":
+          description: Invoice number already exists
+
+  /admin/invoices/{id}:
+    patch:
+      operationId: updateAdminInvoice
+      tags: [admin]
+      summary: Update an invoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvoiceUpdate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteAdminInvoice
+      tags: [admin]
+      summary: Delete an invoice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not found
+        "409":
+          description: Paid invoices cannot be deleted
 
 components:
   schemas:
@@ -715,6 +880,66 @@ components:
       properties:
         imageUrl:
           type: ["string", "null"]
+
+    ProjectDeleteResult:
+      type: object
+      required: [detachedTickets, detachedInvoices]
+      properties:
+        detachedTickets:
+          type: number
+        detachedInvoices:
+          type: number
+
+    CustomerUpdate:
+      type: object
+      properties:
+        companyName:
+          type: string
+        contactName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive]
+        password:
+          type: string
+          description: When present and non-empty, replaces the customer's password.
+
+    InvoiceInput:
+      type: object
+      required: [number, customerId, amount, issueDate, dueDate]
+      properties:
+        number:
+          type: string
+        customerId:
+          type: number
+        projectId:
+          type: ["number", "null"]
+        amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [draft, sent, paid, overdue]
+        issueDate:
+          type: string
+        dueDate:
+          type: string
+
+    InvoiceUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [draft, sent, paid, overdue]
+        amount:
+          type: number
+        dueDate:
+          type: string
 
     TicketUpdate:
       type: object

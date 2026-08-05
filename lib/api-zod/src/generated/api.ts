@@ -553,6 +553,19 @@ export const UpdateAdminProjectResponse = zod.object({
 
 
 /**
+ * @summary Delete a project, detaching its tickets and invoices
+ */
+export const DeleteAdminProjectParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAdminProjectResponse = zod.object({
+  "detachedTickets": zod.number(),
+  "detachedInvoices": zod.number()
+})
+
+
+/**
  * @summary Get a ticket with its message thread
  */
 export const GetAdminTicketParams = zod.object({
@@ -693,6 +706,61 @@ export const ListAdminTicketsResponse = zod.array(ListAdminTicketsResponseItem)
 
 
 /**
+ * @summary Get a customer
+ */
+export const GetAdminCustomerParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetAdminCustomerResponse = zod.object({
+  "id": zod.number(),
+  "companyName": zod.string(),
+  "contactName": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string(),
+  "status": zod.enum(['active', 'inactive']),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Update a customer
+ */
+export const UpdateAdminCustomerParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminCustomerBody = zod.object({
+  "companyName": zod.string().optional(),
+  "contactName": zod.string().optional(),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "status": zod.enum(['active', 'inactive']).optional(),
+  "password": zod.string().optional().describe('When present and non-empty, replaces the customer\'s password.')
+})
+
+export const UpdateAdminCustomerResponse = zod.object({
+  "id": zod.number(),
+  "companyName": zod.string(),
+  "contactName": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string(),
+  "status": zod.enum(['active', 'inactive']),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a customer
+ */
+export const DeleteAdminCustomerParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAdminCustomerResponse = zod.void()
+
+
+/**
  * @summary List all invoices (staff only)
  */
 export const ListAdminInvoicesResponseItem = zod.object({
@@ -709,5 +777,72 @@ export const ListAdminInvoicesResponseItem = zod.object({
   "createdAt": zod.string()
 })
 export const ListAdminInvoicesResponse = zod.array(ListAdminInvoicesResponseItem)
+
+
+/**
+ * @summary Create an invoice
+ */
+export const CreateAdminInvoiceBody = zod.object({
+  "number": zod.string(),
+  "customerId": zod.number(),
+  "projectId": zod.number().nullish(),
+  "amount": zod.number(),
+  "currency": zod.string().optional(),
+  "status": zod.enum(['draft', 'sent', 'paid', 'overdue']).optional(),
+  "issueDate": zod.string(),
+  "dueDate": zod.string()
+})
+
+export const CreateAdminInvoiceResponse = zod.object({
+  "id": zod.number(),
+  "number": zod.string(),
+  "customerId": zod.number(),
+  "customerName": zod.string().nullish(),
+  "projectId": zod.number().nullish(),
+  "amount": zod.number(),
+  "currency": zod.string(),
+  "status": zod.enum(['draft', 'sent', 'paid', 'overdue']),
+  "issueDate": zod.string(),
+  "dueDate": zod.string(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Update an invoice
+ */
+export const UpdateAdminInvoiceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateAdminInvoiceBody = zod.object({
+  "status": zod.enum(['draft', 'sent', 'paid', 'overdue']).optional(),
+  "amount": zod.number().optional(),
+  "dueDate": zod.string().optional()
+})
+
+export const UpdateAdminInvoiceResponse = zod.object({
+  "id": zod.number(),
+  "number": zod.string(),
+  "customerId": zod.number(),
+  "customerName": zod.string().nullish(),
+  "projectId": zod.number().nullish(),
+  "amount": zod.number(),
+  "currency": zod.string(),
+  "status": zod.enum(['draft', 'sent', 'paid', 'overdue']),
+  "issueDate": zod.string(),
+  "dueDate": zod.string(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete an invoice
+ */
+export const DeleteAdminInvoiceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteAdminInvoiceResponse = zod.void()
 
 

@@ -1,13 +1,45 @@
 import React, { useState } from 'react';
-import { useListAdminProjects, useListAdminCustomers, useCreateAdminProject, getListAdminProjectsQueryKey, ProjectInputStatus } from '@workspace/api-client-react';
-import { Loader2, Plus, X } from 'lucide-react';
+import { useListAdminProjects, useListAdminCustomers, useCreateAdminProject, useUpdateAdminProject, useDeleteAdminProject, getListAdminProjectsQueryKey, ProjectInputStatus } from '@workspace/api-client-react';
+import { Loader2, Plus, X, Trash2, AlertTriangle } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function AdminProjects() {
   const { data: projects, isLoading } = useListAdminProjects();
   const { data: customers } = useListAdminCustomers();
   const createProject = useCreateAdminProject();
+  const updateProject = useUpdateAdminProject();
+  const deleteProject = useDeleteAdminProject();
   const queryClient = useQueryClient();
+
+  const [confirmingId, setConfirmingId] = useState<number | null>(null);
+  const [rowError, setRowError] = useState<string | null>(null);
+  const [detached, setDetached] = useState<string | null>(null);
+
+  const refreshProjects = () => queryClient.invalidateQueries({ queryKey: getListAdminProjectsQueryKey() });
+
+  const changeStatus = (id: number, status: string) => {
+    setRowError(null);
+    updateProject.mutate({ id, data: { status: status as ProjectInputStatus } }, {
+      onSuccess: refreshProjects,
+      onError: (err) => setRowError(err instanceof Error ? err.message : 'Could not update the project.'),
+    });
+  };
+
+  const confirmDelete = (id: number) => {
+    setRowError(null);
+    deleteProject.mutate({ id }, {
+      onSuccess: (result) => {
+        setConfirmingId(null);
+        // Tickets and invoices survive the project — say so, so nobody
+        // assumes they were deleted too.
+        const t = result?.detachedTickets ?? 0;
+        const i = result?.detachedInvoices ?? 0;
+        setDetached(t || i ? `Project deleted. ${t} ticket(s) and ${i} invoice(s) were kept and detached from it.` : null);
+        refreshProjects();
+      },
+      onError: (err) => setRowError(err instanceof Error ? err.message : 'Could not delete the project.'),
+    });
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -66,6 +98,15 @@ export default function AdminProjects() {
         </button>
       </div>
 
+      {detached && (
+        <div className="flex items-start justify-between gap-4 rounded-md border border-border bg-muted/40 px-4 py-3">
+          <p className="text-sm text-foreground">{detached}</p>
+          <button onClick={() => setDetached(null)} aria-label="Dismiss" className="text-muted-foreground hover:text-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -76,6 +117,7 @@ export default function AdminProjects() {
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Progress</th>
                 <th className="px-6 py-4">Created</th>
+                <th className="px-6 py-4"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -85,16 +127,29 @@ export default function AdminProjects() {
                 const pct = totalM === 0 ? 0 : Math.round((doneM / totalM) * 100);
 
                 return (
-                  <tr key={project.id} className="hover:bg-muted/30 transition-colors">
+                  <React.Fragment key={project.id}>
+                  <tr className="hover:bg-muted/30 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-bold text-foreground">{project.title}</div>
                       <div className="text-xs text-muted-foreground font-mono-label mt-1">PRJ-{project.id.toString().padStart(4, '0')}</div>
                     </td>
                     <td className="px-6 py-4 font-medium">{project.customerName || `Customer #${project.customerId}`}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${getStatusColor(project.status)}`}>
-                        {project.status.replace('-', ' ')}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${getStatusColor(project.status)}`}>
+                          {project.status.replace('-', ' ')}
+                        </span>
+                        <select
+                          value={project.status}
+                          onChange={(e) => changeStatus(project.id, e.target.value)}
+                          aria-label={`Change status of ${project.title}`}
+                          className="rounded-md border border-border bg-background px-2 py-1 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                          {['scoping', 'in-progress', 'on-hold', 'completed'].map((s) => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
@@ -107,12 +162,47 @@ export default function AdminProjects() {
                     <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
                       {new Date(project.createdAt).toLocaleDateString()}
                     </td>
+                    <td className="whitespace-nowrap px-6 py-4 text-right">
+                      <button
+                        onClick={() => { setConfirmingId(project.id); setRowError(null); setDetached(null); }}
+                        aria-label={`Delete ${project.title}`}
+                        className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
                   </tr>
+
+                  {confirmingId === project.id && (
+                    <tr>
+                      <td colSpan={6} className="bg-destructive/5 px-6 py-4">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <AlertTriangle className="h-5 w-5 shrink-0 text-destructive" />
+                          <span className="text-sm text-foreground">
+                            Delete <strong>{project.title}</strong>? Its tickets and invoices are kept and detached from the project.
+                          </span>
+                          <div className="ml-auto flex gap-2">
+                            <button
+                              onClick={() => confirmDelete(project.id)}
+                              disabled={deleteProject.isPending}
+                              className="inline-flex items-center gap-2 rounded-md bg-destructive px-3 py-1.5 text-sm font-semibold text-destructive-foreground transition-opacity hover:opacity-90 disabled:opacity-70"
+                            >
+                              {deleteProject.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                              Delete
+                            </button>
+                            <button onClick={() => setConfirmingId(null)} className="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground">Cancel</button>
+                          </div>
+                        </div>
+                        {rowError && <p className="mt-3 text-sm font-medium text-destructive">{rowError}</p>}
+                      </td>
+                    </tr>
+                  )}
+                  </React.Fragment>
                 );
               })}
               {!projects?.length && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">No projects found.</td>
+                  <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">No projects found.</td>
                 </tr>
               )}
             </tbody>

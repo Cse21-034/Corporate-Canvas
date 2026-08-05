@@ -115,6 +115,97 @@ router.post("/admin/customers", requireStaff, async (req, res): Promise<void> =>
   });
 });
 
+router.get("/admin/customers/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const [customer] = await db.select().from(customersTable).where(eq(customersTable.id, id));
+  if (!customer) {
+    res.status(404).json({ error: "Customer not found" });
+    return;
+  }
+  const { passwordHash: _omit, ...safe } = customer;
+  res.json({ ...safe, createdAt: customer.createdAt.toISOString() });
+});
+
+router.patch("/admin/customers/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const { companyName, contactName, email, phone, status, password } = req.body;
+
+  const patch: Record<string, string> = {};
+  if (companyName !== undefined) patch["companyName"] = String(companyName).trim();
+  if (contactName !== undefined) patch["contactName"] = String(contactName).trim();
+  if (phone !== undefined) patch["phone"] = String(phone).trim();
+  if (status !== undefined) patch["status"] = status;
+
+  if (email !== undefined) {
+    const normalised = String(email).trim().toLowerCase();
+    const [clash] = await db.select().from(customersTable).where(eq(customersTable.email, normalised));
+    if (clash && clash.id !== id) {
+      res.status(409).json({ error: "Another customer already uses that email" });
+      return;
+    }
+    patch["email"] = normalised;
+  }
+
+  if (password !== undefined && String(password) !== "") {
+    if (String(password).length < 8) {
+      res.status(400).json({ error: "password must be at least 8 characters" });
+      return;
+    }
+    patch["passwordHash"] = await hashPassword(String(password));
+  }
+
+  if (Object.keys(patch).length === 0) {
+    res.status(400).json({ error: "No fields to update" });
+    return;
+  }
+
+  const [record] = await db.update(customersTable).set(patch).where(eq(customersTable.id, id)).returning();
+  if (!record) {
+    res.status(404).json({ error: "Customer not found" });
+    return;
+  }
+  const { passwordHash: _omit, ...safe } = record;
+  res.json({ ...safe, createdAt: record.createdAt.toISOString() });
+});
+
+router.delete("/admin/customers/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+
+  const [customer] = await db.select().from(customersTable).where(eq(customersTable.id, id));
+  if (!customer) {
+    res.status(404).json({ error: "Customer not found" });
+    return;
+  }
+
+  // customerId on these tables is a bare integer with no foreign key, so
+  // Postgres would let the delete through and leave the rows pointing at a
+  // customer that no longer exists. Refuse instead, and say what is in the
+  // way — deactivating keeps the history intact.
+  const [projects, tickets, invoices] = await Promise.all([
+    db.select().from(projectsTable).where(eq(projectsTable.customerId, id)),
+    db.select().from(ticketsTable).where(eq(ticketsTable.customerId, id)),
+    db.select().from(invoicesTable).where(eq(invoicesTable.customerId, id)),
+  ]);
+
+  if (projects.length || tickets.length || invoices.length) {
+    const parts = [
+      projects.length ? `${projects.length} project${projects.length === 1 ? "" : "s"}` : null,
+      tickets.length ? `${tickets.length} ticket${tickets.length === 1 ? "" : "s"}` : null,
+      invoices.length ? `${invoices.length} invoice${invoices.length === 1 ? "" : "s"}` : null,
+    ].filter(Boolean);
+    res.status(409).json({
+      error: `This customer still has ${parts.join(", ")}. Delete those first, or set the customer to inactive instead.`,
+    });
+    return;
+  }
+
+  await db.delete(customersTable).where(eq(customersTable.id, id));
+  res.sendStatus(204);
+});
+
 router.get("/admin/projects", requireStaff, async (_req, res): Promise<void> => {
   const projects = await db.select({
     id: projectsTable.id,
@@ -167,6 +258,38 @@ router.patch("/admin/projects/:id", requireStaff, async (req, res): Promise<void
     return;
   }
   res.json({ ...project, customerName: null, createdAt: project.createdAt.toISOString() });
+});
+
+router.delete("/admin/projects/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+
+  const [project] = await db.select().from(projectsTable).where(eq(projectsTable.id, id));
+  if (!project) {
+    res.status(404).json({ error: "Project not found" });
+    return;
+  }
+
+  // Same absent-foreign-key problem as customers: tickets and invoices carry a
+  // projectId that nothing enforces. Rather than orphan them, detach them —
+  // they still belong to the customer, just no longer to a project.
+  const [tickets, invoices] = await Promise.all([
+    db.select().from(ticketsTable).where(eq(ticketsTable.projectId, id)),
+    db.select().from(invoicesTable).where(eq(invoicesTable.projectId, id)),
+  ]);
+
+  if (tickets.length) {
+    await db.update(ticketsTable).set({ projectId: null }).where(eq(ticketsTable.projectId, id));
+  }
+  if (invoices.length) {
+    await db.update(invoicesTable).set({ projectId: null }).where(eq(invoicesTable.projectId, id));
+  }
+
+  await db.delete(projectsTable).where(eq(projectsTable.id, id));
+  res.status(200).json({
+    detachedTickets: tickets.length,
+    detachedInvoices: invoices.length,
+  });
 });
 
 router.get("/admin/tickets", requireStaff, async (_req, res): Promise<void> => {
@@ -262,6 +385,104 @@ router.delete("/admin/tickets/:id", requireStaff, async (req, res): Promise<void
     res.status(404).json({ error: "Ticket not found" });
     return;
   }
+  res.sendStatus(204);
+});
+
+router.post("/admin/invoices", requireStaff, async (req, res): Promise<void> => {
+  const { number, customerId, projectId, amount, currency, status, issueDate, dueDate } = req.body;
+
+  if (!number || !customerId || amount === undefined || !issueDate || !dueDate) {
+    res.status(400).json({ error: "number, customerId, amount, issueDate and dueDate are required" });
+    return;
+  }
+
+  const parsedAmount = Number(amount);
+  if (Number.isNaN(parsedAmount) || parsedAmount < 0) {
+    res.status(400).json({ error: "amount must be a non-negative number" });
+    return;
+  }
+
+  const [existing] = await db.select().from(invoicesTable).where(eq(invoicesTable.number, String(number).trim()));
+  if (existing) {
+    res.status(409).json({ error: "An invoice with that number already exists" });
+    return;
+  }
+
+  const [record] = await db
+    .insert(invoicesTable)
+    .values({
+      number: String(number).trim(),
+      customerId: Number(customerId),
+      projectId: projectId ? Number(projectId) : null,
+      // numeric columns round-trip as strings in pg
+      amount: String(parsedAmount),
+      currency: currency ?? "BWP",
+      status: status ?? "draft",
+      issueDate,
+      dueDate,
+    })
+    .returning();
+
+  res.status(201).json({
+    ...record,
+    amount: parseFloat(String(record.amount)),
+    customerName: null,
+    createdAt: record.createdAt.toISOString(),
+  });
+});
+
+router.patch("/admin/invoices/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const { status, amount, dueDate } = req.body;
+
+  const patch: Record<string, string> = {};
+  if (status !== undefined) patch["status"] = status;
+  if (dueDate !== undefined) patch["dueDate"] = dueDate;
+  if (amount !== undefined) {
+    const parsedAmount = Number(amount);
+    if (Number.isNaN(parsedAmount) || parsedAmount < 0) {
+      res.status(400).json({ error: "amount must be a non-negative number" });
+      return;
+    }
+    patch["amount"] = String(parsedAmount);
+  }
+  if (Object.keys(patch).length === 0) {
+    res.status(400).json({ error: "status, amount or dueDate is required" });
+    return;
+  }
+
+  const [record] = await db.update(invoicesTable).set(patch).where(eq(invoicesTable.id, id)).returning();
+  if (!record) {
+    res.status(404).json({ error: "Invoice not found" });
+    return;
+  }
+  res.json({
+    ...record,
+    amount: parseFloat(String(record.amount)),
+    customerName: null,
+    createdAt: record.createdAt.toISOString(),
+  });
+});
+
+router.delete("/admin/invoices/:id", requireStaff, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+
+  const [invoice] = await db.select().from(invoicesTable).where(eq(invoicesTable.id, id));
+  if (!invoice) {
+    res.status(404).json({ error: "Invoice not found" });
+    return;
+  }
+
+  // A paid invoice is an accounting record, not a draft — refuse to erase it
+  // and let staff mark it cancelled instead.
+  if (invoice.status === "paid") {
+    res.status(409).json({ error: "A paid invoice cannot be deleted" });
+    return;
+  }
+
+  await db.delete(invoicesTable).where(eq(invoicesTable.id, id));
   res.sendStatus(204);
 });
 

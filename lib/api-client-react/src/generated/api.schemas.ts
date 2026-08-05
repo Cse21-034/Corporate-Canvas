@@ -28,6 +28,67 @@ export interface ServiceUpdate {
   imageUrl?: string | null;
 }
 
+export interface ProjectDeleteResult {
+  detachedTickets: number;
+  detachedInvoices: number;
+}
+
+export type CustomerUpdateStatus = typeof CustomerUpdateStatus[keyof typeof CustomerUpdateStatus];
+
+
+export const CustomerUpdateStatus = {
+  active: 'active',
+  inactive: 'inactive',
+} as const;
+
+export interface CustomerUpdate {
+  companyName?: string;
+  contactName?: string;
+  email?: string;
+  phone?: string;
+  status?: CustomerUpdateStatus;
+  /** When present and non-empty, replaces the customer's password. */
+  password?: string;
+}
+
+export type InvoiceInputStatus = typeof InvoiceInputStatus[keyof typeof InvoiceInputStatus];
+
+
+export const InvoiceInputStatus = {
+  draft: 'draft',
+  sent: 'sent',
+  paid: 'paid',
+  overdue: 'overdue',
+} as const;
+
+export interface InvoiceInput {
+  number: string;
+  customerId: number;
+  /** @nullable */
+  projectId?: number | null;
+  amount: number;
+  currency?: string;
+  status?: InvoiceInputStatus;
+  issueDate: string;
+  dueDate: string;
+}
+
+export type InvoiceUpdateStatus = typeof InvoiceUpdateStatus[keyof typeof InvoiceUpdateStatus];
+
+
+export const InvoiceUpdateStatus = {
+  draft: 'draft',
+  sent: 'sent',
+  paid: 'paid',
+  overdue: 'overdue',
+} as const;
+
+export interface InvoiceUpdate {
+  status?: InvoiceUpdateStatus;
+  amount?: number;
+  dueDate?: string;
+}
+
 export type TicketUpdateStatus = typeof TicketUpdateStatus[keyof typeof TicketUpdateStatus];
 
 
