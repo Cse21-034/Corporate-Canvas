@@ -181,6 +181,13 @@ export const ListPortalProjectsResponseItem = zod.object({
   "dueDate": zod.string().nullish(),
   "done": zod.boolean()
 })),
+  "messages": zod.array(zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
+  "createdAt": zod.string()
+})).optional(),
   "startDate": zod.string().nullish(),
   "targetDate": zod.string().nullish(),
   "createdAt": zod.string()
@@ -207,8 +214,38 @@ export const GetPortalProjectResponse = zod.object({
   "dueDate": zod.string().nullish(),
   "done": zod.boolean()
 })),
+  "messages": zod.array(zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
+  "createdAt": zod.string()
+})).optional(),
   "startDate": zod.string().nullish(),
   "targetDate": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Post a message on my project
+ */
+export const CreatePortalProjectMessageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const CreatePortalProjectMessageBody = zod.object({
+  "body": zod.string().min(1)
+})
+
+export const CreatePortalProjectMessageResponse = zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
   "createdAt": zod.string()
 })
 
@@ -479,6 +516,13 @@ export const ListAdminProjectsResponseItem = zod.object({
   "dueDate": zod.string().nullish(),
   "done": zod.boolean()
 })),
+  "messages": zod.array(zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
+  "createdAt": zod.string()
+})).optional(),
   "startDate": zod.string().nullish(),
   "targetDate": zod.string().nullish(),
   "createdAt": zod.string()
@@ -515,6 +559,13 @@ export const CreateAdminProjectResponse = zod.object({
   "dueDate": zod.string().nullish(),
   "done": zod.boolean()
 })),
+  "messages": zod.array(zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
+  "createdAt": zod.string()
+})).optional(),
   "startDate": zod.string().nullish(),
   "targetDate": zod.string().nullish(),
   "createdAt": zod.string()
@@ -552,6 +603,13 @@ export const UpdateAdminProjectResponse = zod.object({
   "dueDate": zod.string().nullish(),
   "done": zod.boolean()
 })),
+  "messages": zod.array(zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
+  "createdAt": zod.string()
+})).optional(),
   "startDate": zod.string().nullish(),
   "targetDate": zod.string().nullish(),
   "createdAt": zod.string()
@@ -568,6 +626,29 @@ export const DeleteAdminProjectParams = zod.object({
 export const DeleteAdminProjectResponse = zod.object({
   "detachedTickets": zod.number(),
   "detachedInvoices": zod.number()
+})
+
+
+/**
+ * @summary Post a message on a project as staff
+ */
+export const CreateAdminProjectMessageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const CreateAdminProjectMessageBody = zod.object({
+  "body": zod.string().min(1)
+})
+
+export const CreateAdminProjectMessageResponse = zod.object({
+  "id": zod.number(),
+  "author": zod.string(),
+  "body": zod.string(),
+  "isStaff": zod.boolean(),
+  "createdAt": zod.string()
 })
 
 

@@ -7,6 +7,7 @@
  */
 import type { Milestone } from './milestone';
 import type { ProjectStatus } from './projectStatus';
+import type { TicketMessage } from './ticketMessage';
 
 export interface Project {
   id: number;
@@ -17,6 +18,7 @@ export interface Project {
   /** @nullable */
   customerName?: string | null;
   milestones: Milestone[];
+  messages?: TicketMessage[];
   /** @nullable */
   startDate?: string | null;
   /** @nullable */

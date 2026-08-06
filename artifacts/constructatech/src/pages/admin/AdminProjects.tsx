@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useListAdminProjects, useListAdminCustomers, useCreateAdminProject, useUpdateAdminProject, useDeleteAdminProject, getListAdminProjectsQueryKey, ProjectInputStatus } from '@workspace/api-client-react';
-import { Loader2, Plus, X, Trash2, AlertTriangle } from 'lucide-react';
+import { useListAdminProjects, useListAdminCustomers, useCreateAdminProject, useUpdateAdminProject, useDeleteAdminProject, useCreateAdminProjectMessage, getListAdminProjectsQueryKey, ProjectInputStatus } from '@workspace/api-client-react';
+import { Loader2, Plus, X, Trash2, AlertTriangle, Send, MessageSquare } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 
 export default function AdminProjects() {
@@ -9,11 +9,38 @@ export default function AdminProjects() {
   const createProject = useCreateAdminProject();
   const updateProject = useUpdateAdminProject();
   const deleteProject = useDeleteAdminProject();
+  const sendMessage = useCreateAdminProjectMessage();
   const queryClient = useQueryClient();
 
   const [confirmingId, setConfirmingId] = useState<number | null>(null);
   const [rowError, setRowError] = useState<string | null>(null);
   const [detached, setDetached] = useState<string | null>(null);
+
+  // Client conversation, scoped to one project at a time. Reuses the same
+  // append-only message pattern already built for tickets.
+  const [messagingId, setMessagingId] = useState<number | null>(null);
+  const [reply, setReply] = useState('');
+
+  const openMessages = (id: number) => {
+    setMessagingId(id);
+    setPlanningId(null);
+    setConfirmingId(null);
+    setRowError(null);
+    setReply('');
+  };
+
+  const submitReply = (id: number) => {
+    if (reply.trim() === '') return;
+    sendMessage.mutate(
+      { id, data: { body: reply.trim() } },
+      {
+        onSuccess: () => {
+          setReply('');
+          refreshProjects();
+        },
+      },
+    );
+  };
 
   // Milestone editing. Staff own the delivery plan; the portal shows it to
   // customers read-only.
@@ -22,6 +49,7 @@ export default function AdminProjects() {
 
   const openPlan = (id: number, milestones: Array<{ label: string; dueDate?: string | null; done: boolean }>) => {
     setPlanningId(id);
+    setMessagingId(null);
     setConfirmingId(null);
     setRowError(null);
     setPlan(milestones?.map((m) => ({ label: m.label, dueDate: m.dueDate ?? '', done: m.done })) ?? []);
@@ -193,7 +221,19 @@ export default function AdminProjects() {
                         Milestones
                       </button>
                       <button
-                        onClick={() => { setConfirmingId(project.id); setRowError(null); setDetached(null); }}
+                        onClick={() => (messagingId === project.id ? setMessagingId(null) : openMessages(project.id))}
+                        className="ml-1 inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                      >
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        Messages
+                        {(project.messages?.length ?? 0) > 0 && (
+                          <span className="rounded-full bg-primary/15 px-1.5 text-xs font-bold text-primary">
+                            {project.messages!.length}
+                          </span>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => { setConfirmingId(project.id); setMessagingId(null); setRowError(null); setDetached(null); }}
                         aria-label={`Delete ${project.title}`}
                         className="ml-1 rounded-md p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                       >
@@ -261,6 +301,63 @@ export default function AdminProjects() {
                             Save plan
                           </button>
                           <button onClick={() => setPlanningId(null)} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">Cancel</button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+
+                  {messagingId === project.id && (
+                    <tr>
+                      <td colSpan={6} className="bg-muted/20 px-6 py-5">
+                        <h3 className="mb-3 font-mono-label text-xs text-muted-foreground">
+                          CONVERSATION WITH {project.customerName ?? `CUSTOMER #${project.customerId}`}
+                        </h3>
+
+                        <div className="max-h-80 space-y-3 overflow-y-auto">
+                          {(!project.messages || project.messages.length === 0) && (
+                            <p className="text-sm text-muted-foreground">No messages yet.</p>
+                          )}
+                          {project.messages?.map((msg) => (
+                            <div key={msg.id} className={`flex ${msg.isStaff ? 'justify-end' : 'justify-start'}`}>
+                              <div className={`max-w-[80%] rounded-lg border p-3 ${
+                                msg.isStaff ? 'border-primary/30 bg-primary/5' : 'border-border bg-card'
+                              }`}>
+                                <div className="mb-1 flex items-baseline gap-2">
+                                  <span className="text-xs font-bold text-foreground">{msg.author}</span>
+                                  {msg.isStaff && <span className="font-mono-label text-[10px] text-primary">STAFF</span>}
+                                  <span className="text-[11px] text-muted-foreground">{new Date(msg.createdAt).toLocaleString()}</span>
+                                </div>
+                                <p className="whitespace-pre-wrap text-sm text-card-foreground/90">{msg.body}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {sendMessage.isError && (
+                          <p className="mt-3 text-sm font-medium text-destructive">
+                            {sendMessage.error instanceof Error ? sendMessage.error.message : 'Could not send the message.'}
+                          </p>
+                        )}
+
+                        <div className="mt-4 flex flex-wrap items-start gap-2">
+                          <textarea
+                            rows={2}
+                            value={reply}
+                            onChange={(e) => setReply(e.target.value)}
+                            placeholder="Reply to the client…"
+                            className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                          <button
+                            onClick={() => submitReply(project.id)}
+                            disabled={sendMessage.isPending || reply.trim() === ''}
+                            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+                          >
+                            {sendMessage.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                            Send
+                          </button>
+                          <button onClick={() => setMessagingId(null)} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
+                            Close
+                          </button>
                         </div>
                       </td>
                     </tr>

@@ -259,6 +259,14 @@ export const ProjectStatus = {
   completed: 'completed',
 } as const;
 
+export interface TicketMessage {
+  id: number;
+  author: string;
+  body: string;
+  isStaff: boolean;
+  createdAt: string;
+}
+
 export interface Project {
   id: number;
   title: string;
@@ -268,6 +276,7 @@ export interface Project {
   /** @nullable */
   customerName?: string | null;
   milestones: Milestone[];
+  messages?: TicketMessage[];
   /** @nullable */
   startDate?: string | null;
   /** @nullable */
@@ -314,14 +323,6 @@ export interface ProjectUpdate {
   milestones?: Milestone[];
   /** @nullable */
   targetDate?: string | null;
-}
-
-export interface TicketMessage {
-  id: number;
-  author: string;
-  body: string;
-  isStaff: boolean;
-  createdAt: string;
 }
 
 export type TicketType = typeof TicketType[keyof typeof TicketType];

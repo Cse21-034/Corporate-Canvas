@@ -9,6 +9,7 @@ export const projectsTable = pgTable("projects", {
   status: text("status").notNull().default("scoping"), // scoping | in-progress | on-hold | completed
   customerId: integer("customer_id").notNull(),
   milestones: jsonb("milestones").notNull().default([]),
+  messages: jsonb("messages").notNull().default([]),
   startDate: date("start_date", { mode: "string" }),
   targetDate: date("target_date", { mode: "string" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

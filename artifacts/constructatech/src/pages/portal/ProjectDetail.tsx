@@ -1,14 +1,36 @@
-import React from 'react';
-import { useGetPortalProject, getGetPortalProjectQueryKey } from '@workspace/api-client-react';
+import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+  useGetPortalProject,
+  useCreatePortalProjectMessage,
+  getGetPortalProjectQueryKey,
+} from '@workspace/api-client-react';
 import { useParams, Link } from 'wouter';
-import { Loader2, ArrowLeft, CheckCircle2, Circle, Calendar, Target } from 'lucide-react';
+import { Loader2, ArrowLeft, CheckCircle2, Circle, Calendar, Target, Send } from 'lucide-react';
 
 export default function ProjectDetail() {
   const { id } = useParams();
   const projectId = parseInt(id || '0', 10);
+  const queryClient = useQueryClient();
   const { data: project, isLoading, isError } = useGetPortalProject(projectId, {
     query: { enabled: !!projectId, queryKey: getGetPortalProjectQueryKey(projectId) }
   });
+  const sendMessage = useCreatePortalProjectMessage();
+  const [reply, setReply] = useState('');
+
+  const submitReply = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (reply.trim() === '') return;
+    sendMessage.mutate(
+      { id: projectId, data: { body: reply.trim() } },
+      {
+        onSuccess: () => {
+          setReply('');
+          queryClient.invalidateQueries({ queryKey: getGetPortalProjectQueryKey(projectId) });
+        },
+      },
+    );
+  };
 
   if (isLoading) {
     return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
@@ -97,6 +119,60 @@ export default function ProjectDetail() {
             ))}
           </div>
         )}
+      </div>
+
+      <div className="bg-card border border-border p-8 rounded-xl shadow-sm">
+        <h2 className="font-display font-bold text-xl mb-6 border-b border-border pb-4">Messages</h2>
+
+        <div className="space-y-4">
+          {(!project.messages || project.messages.length === 0) && (
+            <p className="text-muted-foreground italic">
+              No messages yet. Use the box below to ask us anything about this project.
+            </p>
+          )}
+
+          {project.messages?.map((msg) => (
+            <div key={msg.id} className={`flex ${msg.isStaff ? 'justify-start' : 'justify-end'}`}>
+              <div className={`max-w-[85%] rounded-xl border p-4 ${
+                msg.isStaff ? 'border-primary/30 bg-primary/5' : 'border-border bg-background'
+              }`}>
+                <div className="mb-1 flex items-baseline gap-2">
+                  <span className="text-sm font-bold text-foreground">{msg.author}</span>
+                  {msg.isStaff && <span className="font-mono-label text-[10px] text-primary">CONSTRUCTATECH</span>}
+                  <span className="text-xs text-muted-foreground">{new Date(msg.createdAt).toLocaleString()}</span>
+                </div>
+                <p className="whitespace-pre-wrap text-sm text-foreground/90">{msg.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <form onSubmit={submitReply} className="mt-6 space-y-3 border-t border-border pt-6">
+          <label htmlFor="project-reply" className="block text-sm font-semibold text-foreground">
+            Send a message about this project
+          </label>
+          <textarea
+            id="project-reply"
+            rows={3}
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            placeholder="Type your message…"
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          {sendMessage.isError && (
+            <p className="text-sm font-medium text-destructive">
+              {sendMessage.error instanceof Error ? sendMessage.error.message : 'Could not send the message.'}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={sendMessage.isPending || reply.trim() === ''}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+          >
+            {sendMessage.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            Send
+          </button>
+        </form>
       </div>
     </div>
   );

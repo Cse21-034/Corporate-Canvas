@@ -985,6 +985,78 @@ export function useGetPortalProject<TData = Awaited<ReturnType<typeof getPortalP
 
 
 
+export const getCreatePortalProjectMessageUrl = (id: number,) => {
+
+
+
+
+  return `/api/portal/projects/${id}/messages`
+}
+
+/**
+ * @summary Post a message on my project
+ */
+export const createPortalProjectMessage = async (id: number,
+    ticketMessageInput: TicketMessageInput, options?: Parameters<typeof customFetch>[1]): Promise<TicketMessage> => {
+
+  return customFetch<TicketMessage>(getCreatePortalProjectMessageUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(ticketMessageInput)
+  }
+);}
+
+
+
+
+
+export const getCreatePortalProjectMessageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPortalProjectMessage>>, TError,{id: number;data: BodyType<TicketMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createPortalProjectMessage>>, TError,{id: number;data: BodyType<TicketMessageInput>}, TContext> => {
+
+const mutationKey = ['createPortalProjectMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPortalProjectMessage>>, {id: number;data: BodyType<TicketMessageInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createPortalProjectMessage(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreatePortalProjectMessageMutationResult = NonNullable<Awaited<ReturnType<typeof createPortalProjectMessage>>>
+    export type CreatePortalProjectMessageMutationBody = BodyType<TicketMessageInput>
+    export type CreatePortalProjectMessageMutationError = ErrorType<void>
+
+    /**
+ * @summary Post a message on my project
+ */
+export const useCreatePortalProjectMessage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPortalProjectMessage>>, TError,{id: number;data: BodyType<TicketMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createPortalProjectMessage>>,
+        TError,
+        {id: number;data: BodyType<TicketMessageInput>},
+        TContext
+      > => {
+      return useMutation(getCreatePortalProjectMessageMutationOptions(options));
+    }
+
 export const getListPortalTicketsUrl = (params?: ListPortalTicketsParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -2100,6 +2172,78 @@ export const useDeleteAdminProject = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getDeleteAdminProjectMutationOptions(options));
+    }
+
+export const getCreateAdminProjectMessageUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/projects/${id}/messages`
+}
+
+/**
+ * @summary Post a message on a project as staff
+ */
+export const createAdminProjectMessage = async (id: number,
+    ticketMessageInput: TicketMessageInput, options?: Parameters<typeof customFetch>[1]): Promise<TicketMessage> => {
+
+  return customFetch<TicketMessage>(getCreateAdminProjectMessageUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(ticketMessageInput)
+  }
+);}
+
+
+
+
+
+export const getCreateAdminProjectMessageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminProjectMessage>>, TError,{id: number;data: BodyType<TicketMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdminProjectMessage>>, TError,{id: number;data: BodyType<TicketMessageInput>}, TContext> => {
+
+const mutationKey = ['createAdminProjectMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdminProjectMessage>>, {id: number;data: BodyType<TicketMessageInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createAdminProjectMessage(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAdminProjectMessageMutationResult = NonNullable<Awaited<ReturnType<typeof createAdminProjectMessage>>>
+    export type CreateAdminProjectMessageMutationBody = BodyType<TicketMessageInput>
+    export type CreateAdminProjectMessageMutationError = ErrorType<void>
+
+    /**
+ * @summary Post a message on a project as staff
+ */
+export const useCreateAdminProjectMessage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdminProjectMessage>>, TError,{id: number;data: BodyType<TicketMessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createAdminProjectMessage>>,
+        TError,
+        {id: number;data: BodyType<TicketMessageInput>},
+        TContext
+      > => {
+      return useMutation(getCreateAdminProjectMessageMutationOptions(options));
     }
 
 export const getGetAdminTicketUrl = (id: number,) => {

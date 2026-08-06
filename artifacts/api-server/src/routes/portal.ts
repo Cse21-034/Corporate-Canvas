@@ -70,6 +70,27 @@ router.get("/portal/projects/:id", requireCustomer, async (req: any, res): Promi
   res.json({ ...project, customerName: null, createdAt: project.createdAt.toISOString() });
 });
 
+router.post("/portal/projects/:id/messages", requireCustomer, async (req: any, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const { body } = req.body;
+  if (!body || String(body).trim() === "") {
+    res.status(400).json({ error: "body is required" });
+    return;
+  }
+  const [project] = await db.select().from(projectsTable)
+    .where(and(eq(projectsTable.id, id), eq(projectsTable.customerId, req.session.userId)));
+  if (!project) {
+    res.status(404).json({ error: "Project not found" });
+    return;
+  }
+  const msgs = (project.messages as any[]) || [];
+  const newMsg = { id: msgs.length + 1, author: req.session.name, body: String(body).trim(), isStaff: false, createdAt: new Date().toISOString() };
+  msgs.push(newMsg);
+  await db.update(projectsTable).set({ messages: msgs }).where(eq(projectsTable.id, id));
+  res.status(201).json(newMsg);
+});
+
 router.get("/portal/tickets", requireCustomer, async (req: any, res): Promise<void> => {
   const { status } = req.query;
   let query = db.select().from(ticketsTable).where(eq(ticketsTable.customerId, req.session.userId));
