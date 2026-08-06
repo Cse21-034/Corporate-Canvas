@@ -1,98 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Link } from 'wouter';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Reveal } from '../components/Reveal';
 import { PartnerLogos } from '../components/PartnerLogos';
-import { ArrowRight, ArrowUpRight, Activity, Users, Calendar, Settings, Wrench } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Activity, Users, Calendar, Settings, Wrench, Rocket } from 'lucide-react';
 import { useListServices, useListIndustries, useGetStats } from '@workspace/api-client-react';
-import { useTheme } from 'next-themes';
-
-function CanvasNetworkGraph() {
-  const { resolvedTheme } = useTheme();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // A perpetually moving background is exactly what "reduce motion" is
-    // meant to suppress, and CSS alone cannot stop a rAF loop.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-
-    // Light backdrop → dark particles, dark backdrop → light particles, so
-    // the graph stays visible whichever way the theme toggle is set.
-    const particleColor = resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(17, 20, 27, 0.35)';
-
-    const particles: {x: number, y: number, vx: number, vy: number, size: number}[] = [];
-    const numParticles = Math.min(Math.floor(width * height / 15000), 80);
-
-    for (let i = 0; i < numParticles; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: Math.random() * 2 + 1,
-      });
-    }
-
-    let animationFrameId: number;
-
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = particleColor;
-      particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 150) {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(242, 106, 75, ${0.2 * (1 - dist / 150)})`;
-            ctx.lineWidth = 1;
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-          }
-        }
-      });
-      animationFrameId = requestAnimationFrame(render);
-    };
-    render();
-
-    const handleResize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [resolvedTheme]);
-
-  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none opacity-60" />;
-}
 
 export default function Home() {
   const { data: stats } = useGetStats();
@@ -104,31 +17,72 @@ export default function Home() {
       <Header />
 
       {/* ── Hero ── */}
-      <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-background overflow-hidden pt-20">
-        <CanvasNetworkGraph />
-        <div className="container mx-auto px-5 md:px-6 relative z-10 py-16 md:py-20 text-center md:text-left">
-          <div className="max-w-4xl mx-auto md:mx-0">
-            <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.1] tracking-tight mb-5 md:mb-6 animate-in slide-in-from-bottom-8 duration-700">
-              Empowering Botswana Through{' '}
-              <span className="text-primary">Smart Infrastructure</span>
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 md:mb-10 animate-in slide-in-from-bottom-8 duration-700 delay-150">
-              We don't just install hardware; we build the digital backbone for your success. Precision engineering for enterprise networks, data centers, and security systems.
-            </p>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-in slide-in-from-bottom-8 duration-700 delay-300">
-              <Link
-                href="/contact"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-md font-semibold text-base md:text-lg transition-all hover:-translate-y-1 shadow-[0_4px_20px_rgba(201,63,13,0.4)] text-center"
-              >
-                Request a Quote
-              </Link>
-              <Link
-                href="/solutions"
-                className="group border border-border hover:border-foreground/30 hover:bg-accent text-foreground px-8 py-4 rounded-md font-medium text-base md:text-lg transition-all text-center flex items-center justify-center gap-2"
-              >
-                Explore Solutions
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+      <section className="relative w-full pt-32 md:pt-40 pb-16 md:pb-24 bg-background overflow-hidden">
+        <div className="container mx-auto px-5 md:px-6">
+          <div className="grid lg:grid-cols-2 gap-14 lg:gap-16 items-center">
+            {/* Copy */}
+            <div className="text-center lg:text-left animate-in slide-in-from-bottom-8 duration-700">
+              <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl text-foreground leading-[1.1] tracking-tight mb-5 md:mb-6 max-w-xl mx-auto lg:mx-0">
+                Empowering Botswana Through <span className="text-primary">Smart Infrastructure</span>
+              </h1>
+              <p className="text-base sm:text-lg text-muted-foreground max-w-md mx-auto lg:mx-0 mb-8 md:mb-10">
+                We don't just install hardware; we build the digital backbone for your success — precision engineering for enterprise networks, data centers, and security systems.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-8">
+                <Link
+                  href="/contact"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-7 py-3.5 rounded-md font-semibold text-base transition-all hover:-translate-y-0.5 shadow-[0_4px_20px_rgba(201,63,13,0.4)]"
+                >
+                  Request a Quote
+                </Link>
+                <Link href="/solutions" className="group inline-flex items-center gap-2.5 text-foreground font-medium hover:text-primary transition-colors">
+                  <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <Rocket className="w-3.5 h-3.5 text-primary" />
+                  </span>
+                  Explore Solutions
+                </Link>
+              </div>
+            </div>
+
+            {/* Image collage */}
+            <div className="relative max-w-sm sm:max-w-md mx-auto lg:max-w-none lg:mx-0">
+              <div className="grid grid-cols-2 gap-4 md:gap-5">
+                <img
+                  src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=70"
+                  alt="Data center infrastructure built by Constructatech Ventures"
+                  className="w-full aspect-[3/4] object-cover rounded-2xl shadow-lg"
+                />
+                <img
+                  src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=70"
+                  alt="Enterprise network cabling deployed by Constructatech Ventures"
+                  className="w-full aspect-[3/4] object-cover rounded-2xl shadow-lg mt-8 md:mt-10"
+                />
+              </div>
+
+              {/* Floating stat card */}
+              {stats && (
+                <div className="absolute top-2 md:top-4 left-1/2 -translate-x-1/2 bg-foreground text-background rounded-xl px-4 py-3 shadow-xl min-w-[136px]">
+                  <p className="font-mono-label text-background/60 text-[10px] mb-0.5">PROJECTS DELIVERED</p>
+                  <p className="font-display font-bold text-xl leading-none">{stats.projectsCompleted}+</p>
+                </div>
+              )}
+
+              {/* Floating status pill */}
+              <div className="absolute bottom-10 md:bottom-14 -left-3 md:-left-5 bg-card border border-border rounded-full pl-2 pr-4 py-2 shadow-lg flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 relative">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  <span className="absolute w-2 h-2 rounded-full bg-primary animate-ping" />
+                </span>
+                <span className="text-xs font-semibold text-foreground whitespace-nowrap">Network Status: Online</span>
+              </div>
+
+              {/* Floating badge */}
+              {stats && (
+                <div className="absolute -bottom-4 right-2 md:-right-4 w-20 h-20 md:w-24 md:h-24 rounded-full bg-foreground text-background flex flex-col items-center justify-center text-center shadow-xl border-4 border-background">
+                  <span className="font-display font-bold text-lg md:text-xl leading-none">{stats.yearsActive}+</span>
+                  <span className="text-[9px] uppercase tracking-wide mt-1 text-background/70">Years</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

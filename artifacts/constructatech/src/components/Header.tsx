@@ -70,7 +70,7 @@ export function Header() {
                       : 'bg-foreground text-background border-foreground'
                     : useLightText
                       ? 'border-white/25 text-white/90 hover:bg-white/10'
-                      : 'border-border text-foreground/80 hover:bg-accent'
+                      : 'border-foreground dark:border-primary text-foreground/80 hover:bg-accent'
                 }`}
               >
                 {link.label}
@@ -83,14 +83,14 @@ export function Header() {
           <Link
             href="/portal"
             className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-              useLightText ? 'border-white/25 text-white/90 hover:bg-white/10' : 'border-border text-foreground/80 hover:bg-accent'
+              useLightText ? 'border-white/25 text-white/90 hover:bg-white/10' : 'border-foreground dark:border-primary text-foreground/80 hover:bg-accent'
             }`}
           >
             Client Portal
           </Link>
           <ThemeToggle
             className={`rounded-full border ${
-              useLightText ? 'border-white/25 text-white hover:bg-white/10' : 'border-border text-foreground hover:bg-accent'
+              useLightText ? 'border-white/25 text-white hover:bg-white/10' : 'border-foreground dark:border-primary text-foreground hover:bg-accent'
             }`}
           />
           <Link
