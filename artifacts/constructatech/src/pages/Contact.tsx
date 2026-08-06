@@ -3,6 +3,7 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { useSubmitQuoteRequest, useListServices } from '@workspace/api-client-react';
 import { Loader2, CheckCircle2, MapPin, Phone, Mail } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export default function Contact() {
   const { data: services } = useListServices();
@@ -68,6 +69,14 @@ export default function Contact() {
 
             {/* Contact Info */}
             <div className="lg:col-span-2 space-y-8 md:space-y-12">
+              <DotLottieReact
+                src="https://lottie.host/3c81c6d6-065f-4e3c-8345-591acde3a786/Ig244SMbea.lottie"
+                loop
+                autoplay
+                className="w-full h-40 sm:h-52 md:h-64 lg:h-72"
+                aria-hidden="true"
+              />
+
               <div>
                 <h2 className="font-display font-bold text-xl md:text-2xl mb-6 md:mb-8">Contact Information</h2>
                 <div className="space-y-5 md:space-y-6">
