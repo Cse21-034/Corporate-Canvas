@@ -4,7 +4,7 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Reveal } from '../components/Reveal';
 import { PartnerLogos } from '../components/PartnerLogos';
-import { ArrowRight, Activity, Users, Calendar, Settings, Wrench } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Activity, Users, Calendar, Settings, Wrench } from 'lucide-react';
 import { useListServices, useListIndustries, useGetStats } from '@workspace/api-client-react';
 
 function CanvasNetworkGraph() {
@@ -155,7 +155,7 @@ export default function Home() {
       )}
 
       {/* ── Services Showcase ── */}
-      <section className="py-16 md:py-24 bg-[#EAE3D2]">
+      <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-5 md:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-12 mb-10 md:mb-14">
             <div>
@@ -189,7 +189,7 @@ export default function Home() {
               <Reveal key={service.id} delay={cardIdx * 0.08}>
                 <Link
                   href={`/solutions/${service.slug}`}
-                  className="group relative block aspect-[3/4] rounded-2xl overflow-hidden bg-[#D8CFB8]"
+                  className="group relative block aspect-[3/4] rounded-2xl overflow-hidden bg-muted"
                 >
                   {service.imageUrl && (
                     <img
@@ -201,8 +201,11 @@ export default function Home() {
                     />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-                  <span className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4 text-white font-medium text-sm md:text-base leading-tight">
+                  <span className="absolute bottom-3 left-3 right-14 md:bottom-4 md:left-4 md:right-16 text-white font-medium text-sm md:text-base leading-tight">
                     {service.title}
+                  </span>
+                  <span className="absolute bottom-3 right-3 md:bottom-4 md:right-4 w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#26331F] text-white flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
+                    <ArrowUpRight className="w-4 h-4" />
                   </span>
                 </Link>
               </Reveal>

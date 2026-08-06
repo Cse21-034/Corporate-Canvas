@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
-import { Menu, X, ChevronRight } from 'lucide-react';
+import { Menu, X, ChevronRight, ArrowUpRight } from 'lucide-react';
 
 export function Header() {
   const [location] = useLocation();
@@ -59,40 +59,51 @@ export function Header() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-sm font-medium transition-colors relative group ${
-                useLightText ? 'text-white/90 hover:text-white' : 'text-foreground/80 hover:text-foreground'
-              }`}
-            >
-              {link.label}
-              <span className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${
-                isActive(link.href) ? 'w-full' : 'w-0 group-hover:w-full'
-              } ${useLightText ? 'bg-white' : 'bg-primary'}`} />
-            </Link>
-          ))}
+        <nav className="hidden md:flex items-center gap-2">
+          {navLinks.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
+                  active
+                    ? useLightText
+                      ? 'bg-white text-foreground border-white'
+                      : 'bg-foreground text-background border-foreground'
+                    : useLightText
+                      ? 'border-white/25 text-white/90 hover:bg-white/10'
+                      : 'border-border text-foreground/80 hover:bg-accent'
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3">
           <Link
             href="/portal"
-            className={`text-sm font-medium transition-colors ${
-              useLightText ? 'text-white hover:text-white/80' : 'text-foreground hover:text-primary'
+            className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
+              useLightText ? 'border-white/25 text-white/90 hover:bg-white/10' : 'border-border text-foreground/80 hover:bg-accent'
             }`}
           >
             Client Portal
           </Link>
           <ThemeToggle
-            className={useLightText ? 'text-white hover:bg-white/10' : 'text-foreground hover:bg-accent'}
+            className={`rounded-full border ${
+              useLightText ? 'border-white/25 text-white hover:bg-white/10' : 'border-border text-foreground hover:bg-accent'
+            }`}
           />
           <Link
             href="/contact"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-md text-sm font-semibold transition-all hover:-translate-y-0.5 shadow-md"
+            className="group bg-primary hover:bg-primary/90 text-primary-foreground pl-5 pr-1.5 py-1.5 rounded-full text-sm font-semibold transition-all shadow-md flex items-center gap-3"
           >
             Request a Quote
+            <span className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform">
+              <ArrowUpRight className="w-4 h-4" />
+            </span>
           </Link>
         </div>
 
