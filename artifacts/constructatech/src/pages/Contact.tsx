@@ -51,12 +51,12 @@ export default function Contact() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-hero text-white relative">
+      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-background text-foreground relative">
         <div className="container mx-auto px-5 md:px-6 relative z-10">
           <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-5xl max-w-2xl mb-4 md:mb-6">
             Let's build your infrastructure.
           </h1>
-          <p className="text-base md:text-lg text-white/70 max-w-xl">
+          <p className="text-base md:text-lg text-muted-foreground max-w-xl">
             Request a quote or contact our engineering team to discuss your project requirements.
           </p>
         </div>

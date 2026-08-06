@@ -9,13 +9,13 @@ export default function About() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-hero text-white relative">
+      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-background text-foreground relative">
         <div className="container mx-auto px-5 md:px-6 relative z-10">
-          <span className="font-mono-label text-primary-on-dark mb-4 block">OUR STORY</span>
+          <span className="font-mono-label text-primary mb-4 block">OUR STORY</span>
           <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-6xl max-w-3xl mb-5 md:mb-6">
             About Constructatech Ventures
           </h1>
-          <p className="text-base md:text-lg text-white/70 max-w-2xl">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
             We are a 100% citizen-owned IT infrastructure and engineering company, committed to building the digital foundations of modern Botswana.
           </p>
         </div>
@@ -66,7 +66,7 @@ export default function About() {
       </section>
 
       {/* Core Values */}
-      <section className="py-14 md:py-24 bg-hero text-white">
+      <section className="py-14 md:py-24 bg-background text-foreground border-t border-border">
         <div className="container mx-auto px-5 md:px-6">
           <div className="text-center mb-10 md:mb-16">
             <span className="font-mono-label text-primary mb-3 block">CORE VALUES</span>
@@ -87,10 +87,10 @@ export default function About() {
                 desc: 'Service is not a department; it\'s a discipline. We respond instantly, communicate clearly, and resolve completely.',
               },
             ].map(({ sw, en, desc }) => (
-              <div key={sw} className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-xl backdrop-blur-sm">
+              <div key={sw} className="bg-muted border border-border p-6 md:p-8 rounded-xl">
                 <h3 className="font-display font-bold text-2xl md:text-3xl text-primary mb-1 md:mb-2">{sw}</h3>
-                <p className="font-mono-label text-white/50 mb-3 md:mb-4 border-b border-white/10 pb-3 md:pb-4 text-xs">{en}</p>
-                <p className="text-white/70 text-sm md:text-base">{desc}</p>
+                <p className="font-mono-label text-muted-foreground mb-3 md:mb-4 border-b border-border pb-3 md:pb-4 text-xs">{en}</p>
+                <p className="text-muted-foreground text-sm md:text-base">{desc}</p>
               </div>
             ))}
           </div>

@@ -38,16 +38,16 @@ export default function PortalLogin() {
   // have a session is redirected by the effect above once it resolves.
 
   return (
-    <div className="min-h-screen bg-hero flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+    <div className="min-h-screen bg-background flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
       <div className="absolute top-8 left-8">
-        <Link href="/" className="text-white/50 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors">
+        <Link href="/" className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Website
         </Link>
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center mb-8">
-        <Logo variant="light" size="lg" />
-        <h2 className="mt-8 text-center text-3xl font-display font-bold text-white tracking-tight">
+        <Logo variant="full" size="lg" />
+        <h2 className="mt-8 text-center text-3xl font-display font-bold text-foreground tracking-tight">
           System Access
         </h2>
       </div>

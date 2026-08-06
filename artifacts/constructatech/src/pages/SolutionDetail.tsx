@@ -44,11 +44,13 @@ export default function SolutionDetail() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
-      {/* Hero */}
-      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-hero text-white relative overflow-hidden">
+      {/* Hero — a service photo gets a dark overlay so white text stays legible
+          over it (independent of theme); no photo just falls back to the
+          normal page background and text colors. */}
+      <section className={`pt-28 md:pt-32 pb-14 md:pb-20 relative overflow-hidden ${
+        service.imageUrl ? 'text-white' : 'bg-background text-foreground'
+      }`}>
         {service.imageUrl && (
-          /* Sits behind the copy. The overlay keeps the headline and body text
-             above 4.5:1 no matter how bright the photograph is. */
           <div className="absolute inset-0" aria-hidden="true">
             <img
               src={service.imageUrl}
@@ -56,22 +58,25 @@ export default function SolutionDetail() {
               className="h-full w-full object-cover"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-hero/85" />
-            <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/80 to-foreground/40" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/40" />
           </div>
         )}
         <div className="container mx-auto px-5 md:px-6 relative z-10">
           <Link
             href="/solutions"
-            className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-medium mb-6 md:mb-8"
+            className={`inline-flex items-center gap-2 transition-colors text-sm font-medium mb-6 md:mb-8 ${
+              service.imageUrl ? 'text-white/50 hover:text-white' : 'text-muted-foreground hover:text-foreground'
+            }`}
           >
             <ArrowLeft className="w-4 h-4" /> Back to Solutions
           </Link>
-          <span className="font-mono-label text-primary-on-dark mb-4 block">SOLUTION SPECIFICATION</span>
+          <span className={`font-mono-label mb-4 block ${service.imageUrl ? 'text-primary-on-dark' : 'text-primary'}`}>
+            SOLUTION SPECIFICATION
+          </span>
           <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl max-w-4xl mb-5 md:mb-6">
             {service.title}
           </h1>
-          <p className="text-base md:text-xl text-white/70 max-w-2xl">
+          <p className={`text-base md:text-xl max-w-2xl ${service.imageUrl ? 'text-white/70' : 'text-muted-foreground'}`}>
             {service.summary}
           </p>
         </div>

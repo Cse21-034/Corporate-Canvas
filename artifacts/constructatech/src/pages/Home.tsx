@@ -6,8 +6,10 @@ import { Reveal } from '../components/Reveal';
 import { PartnerLogos } from '../components/PartnerLogos';
 import { ArrowRight, ArrowUpRight, Activity, Users, Calendar, Settings, Wrench } from 'lucide-react';
 import { useListServices, useListIndustries, useGetStats } from '@workspace/api-client-react';
+import { useTheme } from 'next-themes';
 
 function CanvasNetworkGraph() {
+  const { resolvedTheme } = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -24,6 +26,10 @@ function CanvasNetworkGraph() {
     let height = window.innerHeight;
     canvas.width = width;
     canvas.height = height;
+
+    // Light backdrop → dark particles, dark backdrop → light particles, so
+    // the graph stays visible whichever way the theme toggle is set.
+    const particleColor = resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(17, 20, 27, 0.35)';
 
     const particles: {x: number, y: number, vx: number, vy: number, size: number}[] = [];
     const numParticles = Math.min(Math.floor(width * height / 15000), 80);
@@ -42,7 +48,7 @@ function CanvasNetworkGraph() {
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.fillStyle = particleColor;
       particles.forEach((p, i) => {
         p.x += p.vx;
         p.y += p.vy;
@@ -83,7 +89,7 @@ function CanvasNetworkGraph() {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [resolvedTheme]);
 
   return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none opacity-60" />;
 }
@@ -98,15 +104,15 @@ export default function Home() {
       <Header />
 
       {/* ── Hero ── */}
-      <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-hero overflow-hidden pt-20">
+      <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-background overflow-hidden pt-20">
         <CanvasNetworkGraph />
         <div className="container mx-auto px-5 md:px-6 relative z-10 py-16 md:py-20 text-center md:text-left">
           <div className="max-w-4xl mx-auto md:mx-0">
-            <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white leading-[1.1] tracking-tight mb-5 md:mb-6 animate-in slide-in-from-bottom-8 duration-700">
+            <h1 className="font-display font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.1] tracking-tight mb-5 md:mb-6 animate-in slide-in-from-bottom-8 duration-700">
               Empowering Botswana Through{' '}
-              <span className="text-primary-on-dark">Smart Infrastructure</span>
+              <span className="text-primary">Smart Infrastructure</span>
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-white/70 max-w-2xl mb-8 md:mb-10 animate-in slide-in-from-bottom-8 duration-700 delay-150">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 md:mb-10 animate-in slide-in-from-bottom-8 duration-700 delay-150">
               We don't just install hardware; we build the digital backbone for your success. Precision engineering for enterprise networks, data centers, and security systems.
             </p>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-in slide-in-from-bottom-8 duration-700 delay-300">
@@ -118,7 +124,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/solutions"
-                className="group border border-white/20 hover:border-white/40 hover:bg-white/5 text-white px-8 py-4 rounded-md font-medium text-base md:text-lg transition-all text-center flex items-center justify-center gap-2"
+                className="group border border-border hover:border-foreground/30 hover:bg-accent text-foreground px-8 py-4 rounded-md font-medium text-base md:text-lg transition-all text-center flex items-center justify-center gap-2"
               >
                 Explore Solutions
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -215,10 +221,10 @@ export default function Home() {
       </section>
 
       {/* ── Industries Strip ── */}
-      <section className="py-16 md:py-24 bg-secondary text-secondary-foreground overflow-hidden">
+      <section className="py-16 md:py-24 bg-background overflow-hidden border-t border-border">
         <div className="container mx-auto px-5 md:px-6">
           <span className="font-mono-label text-primary mb-3 block text-center">INDUSTRIES WE SERVE</span>
-          <h2 className="font-display font-bold text-2xl md:text-3xl text-center text-white mb-10 md:mb-16">
+          <h2 className="font-display font-bold text-2xl md:text-3xl text-center text-foreground mb-10 md:mb-16">
             Tailored for Botswana's key sectors.
           </h2>
 
@@ -226,16 +232,16 @@ export default function Home() {
             {industries?.map((ind) => (
               <div
                 key={ind.id}
-                className="min-w-[260px] sm:min-w-[280px] md:min-w-0 bg-secondary-foreground/5 p-6 md:p-8 rounded-xl border border-white/10 hover:border-primary/50 transition-colors snap-start"
+                className="min-w-[260px] sm:min-w-[280px] md:min-w-0 bg-muted p-6 md:p-8 rounded-xl border border-border hover:border-primary/50 transition-colors snap-start"
               >
-                <h3 className="font-display font-bold text-lg md:text-xl text-white mb-2 md:mb-3">{ind.name}</h3>
-                <p className="text-secondary-foreground/70 text-sm leading-relaxed">{ind.blurb}</p>
+                <h3 className="font-display font-bold text-lg md:text-xl text-foreground mb-2 md:mb-3">{ind.name}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{ind.blurb}</p>
               </div>
             ))}
           </div>
 
           {/* Scroll hint on mobile */}
-          <p className="md:hidden text-center text-white/30 text-xs font-mono-label mt-4">SWIPE TO EXPLORE</p>
+          <p className="md:hidden text-center text-muted-foreground text-xs font-mono-label mt-4">SWIPE TO EXPLORE</p>
         </div>
       </section>
 
@@ -248,7 +254,7 @@ export default function Home() {
       </section>
 
       {/* ── Values Band ── */}
-      <section className="py-16 md:py-24 bg-hero text-white">
+      <section className="py-16 md:py-24 bg-background text-foreground border-t border-border">
         <div className="container mx-auto px-5 md:px-6">
           <div className="text-center mb-10 md:mb-16">
             <h2 className="font-display font-bold text-2xl md:text-4xl">Rooted in our heritage.</h2>
@@ -260,9 +266,9 @@ export default function Home() {
               { sw: 'Tirelo', en: 'SERVICE EXCELLENCE', desc: 'Uncompromising support and maintenance standards for every client, big or small.' },
             ].map(({ sw, en, desc }) => (
               <div key={sw} className="text-center px-2 sm:px-4">
-                <h3 className="font-display font-bold text-2xl md:text-3xl text-primary-on-dark mb-1 md:mb-2">{sw}</h3>
-                <p className="font-mono-label text-white/50 mb-3 md:mb-4 text-xs">{en}</p>
-                <p className="text-white/70 text-sm md:text-base">{desc}</p>
+                <h3 className="font-display font-bold text-2xl md:text-3xl text-primary mb-1 md:mb-2">{sw}</h3>
+                <p className="font-mono-label text-muted-foreground mb-3 md:mb-4 text-xs">{en}</p>
+                <p className="text-muted-foreground text-sm md:text-base">{desc}</p>
               </div>
             ))}
           </div>
@@ -270,18 +276,17 @@ export default function Home() {
       </section>
 
       {/* ── CTA Band ── */}
-      <section className="py-16 md:py-24 bg-primary text-primary-foreground text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvc3ZnPg==')] opacity-30" />
-        <div className="container mx-auto px-5 md:px-6 relative z-10">
+      <section className="py-16 md:py-24 bg-background text-foreground text-center border-t border-border">
+        <div className="container mx-auto px-5 md:px-6">
           <h2 className="font-display font-bold text-3xl sm:text-4xl md:text-5xl mb-4 max-w-3xl mx-auto leading-tight">
             Ready to transform your infrastructure?
           </h2>
-          <p className="text-base md:text-xl text-white/90 mb-8 md:mb-10 max-w-2xl mx-auto">
+          <p className="text-base md:text-xl text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto">
             Get in touch — we'll have a comprehensive quote ready for you within 24 hours.
           </p>
           <Link
             href="/contact"
-            className="inline-block bg-white text-primary px-8 md:px-10 py-4 rounded-md font-bold text-base md:text-lg hover:bg-white/90 transition-colors shadow-xl"
+            className="inline-block bg-primary hover:bg-primary/90 text-primary-foreground px-8 md:px-10 py-4 rounded-md font-bold text-base md:text-lg transition-colors shadow-xl"
           >
             Request a Quote
           </Link>

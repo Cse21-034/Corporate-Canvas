@@ -25,9 +25,6 @@
   --color-primary-border: var(--primary-border);
   --color-primary-on-dark: hsl(var(--primary-on-dark));
 
-  --color-hero: hsl(var(--hero));
-  --color-hero-foreground: hsl(var(--hero-foreground));
-
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-secondary-border: var(--secondary-border);
@@ -80,10 +77,9 @@
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 0%;
   --popover-border: 220 15% 91%;
-  /* Fixed brand navy — the hero-banner and sidebar surface in every theme.
-     Dark mode reuses this exact value as its page background. */
+  /* Fixed brand navy, reused as dark mode's page background below — not a
+     Tailwind utility, since every page section now themes off --background. */
   --hero: 225 18% 14%;
-  --hero-foreground: 0 0% 100%;
   /* Brand orange, darkened from 62% so white button text clears WCAG AA
      (4.99:1) and `text-primary` clears it as body text on the light
      background (4.64:1). At 62% those were 2.79:1 and 2.60:1. The lighter

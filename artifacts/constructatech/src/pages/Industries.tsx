@@ -30,13 +30,13 @@ export default function Industries() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
-      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-hero text-white relative">
+      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-background text-foreground relative">
         <div className="container mx-auto px-5 md:px-6 relative z-10">
-          <span className="font-mono-label text-primary-on-dark mb-4 block">SECTORS</span>
+          <span className="font-mono-label text-primary mb-4 block">SECTORS</span>
           <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-6xl max-w-3xl mb-5 md:mb-6">
             Industries We Serve
           </h1>
-          <p className="text-base md:text-lg text-white/70 max-w-2xl">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
             Custom-engineered infrastructure solutions for Botswana's most critical economic sectors.
           </p>
         </div>

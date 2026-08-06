@@ -25,13 +25,10 @@ export function Header() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileMenuOpen]);
 
-  // Pages whose hero sits on a dark background, so the unscrolled header
-  // needs light text. Nested routes (e.g. /solutions/:slug) match too.
-  const darkHeroPaths = ['/', '/about', '/solutions', '/industries', '/contact'];
-  const isDarkHero = darkHeroPaths.some(
-    (path) => location === path || (path !== '/' && location.startsWith(`${path}/`)),
-  );
-  const useLightText = isDarkHero && !isScrolled && !mobileMenuOpen;
+  // Every hero is now a plain light/dark-themed background except the
+  // solution-detail page, which still overlays a dark gradient on its
+  // service photo — that's the one unscrolled header that needs light text.
+  const useLightText = location.startsWith('/solutions/') && !isScrolled && !mobileMenuOpen;
 
   const navLinks = [
     { href: '/about', label: 'About' },
@@ -109,7 +106,7 @@ export function Header() {
 
         {/* Mobile Toggle — large touch target */}
         <button
-          className="md:hidden z-50 p-3 -mr-1 rounded-lg hover:bg-white/10 transition-colors"
+          className={`md:hidden z-50 p-3 -mr-1 rounded-lg transition-colors ${useLightText ? 'hover:bg-white/10' : 'hover:bg-accent'}`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
         >
