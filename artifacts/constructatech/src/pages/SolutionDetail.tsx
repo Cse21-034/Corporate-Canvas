@@ -45,7 +45,7 @@ export default function SolutionDetail() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-foreground text-white relative overflow-hidden">
+      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-hero text-white relative overflow-hidden">
         {service.imageUrl && (
           /* Sits behind the copy. The overlay keeps the headline and body text
              above 4.5:1 no matter how bright the photograph is. */
@@ -56,7 +56,7 @@ export default function SolutionDetail() {
               className="h-full w-full object-cover"
               decoding="async"
             />
-            <div className="absolute inset-0 bg-foreground/85" />
+            <div className="absolute inset-0 bg-hero/85" />
             <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/80 to-foreground/40" />
           </div>
         )}

@@ -4,7 +4,7 @@ import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { Reveal } from '../components/Reveal';
 import { PartnerLogos } from '../components/PartnerLogos';
-import { ArrowRight, CheckCircle2, ChevronRight, Activity, Users, Calendar, Settings } from 'lucide-react';
+import { ArrowRight, Activity, Users, Calendar, Settings, Wrench } from 'lucide-react';
 import { useListServices, useListIndustries, useGetStats } from '@workspace/api-client-react';
 
 function CanvasNetworkGraph() {
@@ -98,7 +98,7 @@ export default function Home() {
       <Header />
 
       {/* ── Hero ── */}
-      <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-foreground overflow-hidden pt-20">
+      <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-hero overflow-hidden pt-20">
         <CanvasNetworkGraph />
         <div className="container mx-auto px-5 md:px-6 relative z-10 py-16 md:py-20 text-center md:text-left">
           <div className="max-w-4xl mx-auto md:mx-0">
@@ -154,29 +154,44 @@ export default function Home() {
         </section>
       )}
 
-      {/* ── Services Grid ── */}
-      <section className="py-16 md:py-24 bg-background">
+      {/* ── Services Showcase ── */}
+      <section className="py-16 md:py-24 bg-[#EAE3D2]">
         <div className="container mx-auto px-5 md:px-6">
-          <div className="text-center md:text-left mb-10 md:mb-16">
-            <span className="font-mono-label text-primary mb-3 block">OUR CORE SOLUTIONS</span>
-            <h2 className="font-display font-bold text-2xl md:text-4xl text-foreground max-w-2xl">
-              Engineered systems for the modern enterprise.
-            </h2>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-12 mb-10 md:mb-14">
+            <div>
+              <span className="inline-flex items-center gap-2 bg-[#26331F] text-white text-xs font-medium px-3 py-1.5 rounded-full mb-5 md:mb-6">
+                <Wrench className="w-3.5 h-3.5" />
+                Our Solutions
+              </span>
+              <h2 className="font-['Instrument_Serif'] italic text-[#1F2A1D] text-3xl sm:text-4xl md:text-5xl leading-[1.15] max-w-md">
+                What we can do for you
+              </h2>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-end gap-6 md:max-w-md">
+              <p className="text-[#5B5647] text-sm md:text-base leading-relaxed">
+                From infrastructure design to deployment and support, we provide reliable IT solutions tailored to your business needs.
+              </p>
+              <Link
+                href="/solutions"
+                className="group inline-flex items-center gap-3 bg-white text-[#1F2A1D] pl-5 pr-1.5 py-1.5 rounded-full text-sm font-medium shrink-0 hover:bg-white/90 transition-colors shadow-sm self-start sm:self-auto"
+              >
+                See our services
+                <span className="w-8 h-8 rounded-full bg-[#26331F] text-white flex items-center justify-center group-hover:translate-x-0.5 transition-transform shrink-0">
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {services?.slice(0, 4).map((service, cardIdx) => (
-              <Reveal key={service.id} delay={cardIdx * 0.08} className="flex">
-              <Link
-                href={`/solutions/${service.slug}`}
-                className="group bg-card rounded-xl border border-border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col w-full"
-              >
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top duration-300 z-10" />
-
-                {service.imageUrl && (
-                  /* Fixed aspect ratio reserves the space before the image
-                     arrives, so the card never shifts the page as it loads. */
-                  <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+              <Reveal key={service.id} delay={cardIdx * 0.08}>
+                <Link
+                  href={`/solutions/${service.slug}`}
+                  className="group relative block aspect-[3/4] rounded-2xl overflow-hidden bg-[#D8CFB8]"
+                >
+                  {service.imageUrl && (
                     <img
                       src={service.imageUrl}
                       alt=""
@@ -184,33 +199,12 @@ export default function Home() {
                       decoding="async"
                       className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card/70 via-card/10 to-transparent" />
-                  </div>
-                )}
-
-                <div className="flex flex-col flex-grow p-6 md:p-8">
-                  <div className="w-12 h-12 md:w-14 md:h-14 bg-muted rounded-lg flex items-center justify-center mb-5 md:mb-6 group-hover:bg-primary/10 transition-colors shrink-0">
-                    <Activity className="w-6 h-6 md:w-7 md:h-7 text-primary" />
-                  </div>
-
-                  <h3 className="font-display font-bold text-xl md:text-2xl text-card-foreground mb-3 md:mb-4">{service.title}</h3>
-                  <p className="text-muted-foreground mb-5 md:mb-8 flex-grow text-sm md:text-base">{service.summary}</p>
-
-                  <div className="space-y-2 md:space-y-3 mb-5 md:mb-8">
-                    {service.includes.slice(0, 3).map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0 mt-0.5" />
-                        <span className="text-xs md:text-sm font-medium text-card-foreground/80">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-auto flex items-center text-primary font-medium text-sm group-hover:gap-2 transition-all pt-4 md:pt-0 border-t border-border md:border-0">
-                    View Specifications
-                    <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                  </div>
-                </div>
-              </Link>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                  <span className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4 text-white font-medium text-sm md:text-base leading-tight">
+                    {service.title}
+                  </span>
+                </Link>
               </Reveal>
             ))}
           </div>
@@ -243,7 +237,7 @@ export default function Home() {
       </section>
 
       {/* ── Affiliates Strip ── */}
-      <section className="py-12 md:py-16 bg-white border-y border-border">
+      <section className="py-12 md:py-16 bg-background border-y border-border">
         <div className="container mx-auto px-5 md:px-6 text-center">
           <span className="font-mono-label text-muted-foreground mb-6 md:mb-8 block text-xs">OUR TECHNOLOGY PARTNERS</span>
           <PartnerLogos />
@@ -251,7 +245,7 @@ export default function Home() {
       </section>
 
       {/* ── Values Band ── */}
-      <section className="py-16 md:py-24 bg-foreground text-white">
+      <section className="py-16 md:py-24 bg-hero text-white">
         <div className="container mx-auto px-5 md:px-6">
           <div className="text-center mb-10 md:mb-16">
             <h2 className="font-display font-bold text-2xl md:text-4xl">Rooted in our heritage.</h2>

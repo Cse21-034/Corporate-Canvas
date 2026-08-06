@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Logo } from './Logo';
+import { ThemeToggle } from './ThemeToggle';
 import { Menu, X, ChevronRight } from 'lucide-react';
 
 export function Header() {
@@ -48,7 +49,7 @@ export function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-white/90 backdrop-blur-md border-b border-border shadow-sm py-3'
+          ? 'bg-background/90 backdrop-blur-md border-b border-border shadow-sm py-3'
           : 'bg-transparent py-5'
       }`}
     >
@@ -75,7 +76,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-4">
           <Link
             href="/portal"
             className={`text-sm font-medium transition-colors ${
@@ -84,6 +85,9 @@ export function Header() {
           >
             Client Portal
           </Link>
+          <ThemeToggle
+            className={useLightText ? 'text-white hover:bg-white/10' : 'text-foreground hover:bg-accent'}
+          />
           <Link
             href="/contact"
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-md text-sm font-semibold transition-all hover:-translate-y-0.5 shadow-md"
@@ -141,6 +145,11 @@ export function Header() {
               Client Portal
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </Link>
+
+            <div className="flex items-center justify-between py-4 border-b border-border">
+              <span className="font-display font-semibold text-xl text-foreground">Dark Mode</span>
+              <ThemeToggle className="text-foreground hover:bg-accent" />
+            </div>
           </nav>
 
           {/* CTA */}

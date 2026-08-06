@@ -9,7 +9,7 @@ export default function About() {
       <Header />
 
       {/* Hero */}
-      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-foreground text-white relative">
+      <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-hero text-white relative">
         <div className="container mx-auto px-5 md:px-6 relative z-10">
           <span className="font-mono-label text-primary-on-dark mb-4 block">OUR STORY</span>
           <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-6xl max-w-3xl mb-5 md:mb-6">
@@ -66,7 +66,7 @@ export default function About() {
       </section>
 
       {/* Core Values */}
-      <section className="py-14 md:py-24 bg-foreground text-white">
+      <section className="py-14 md:py-24 bg-hero text-white">
         <div className="container mx-auto px-5 md:px-6">
           <div className="text-center mb-10 md:mb-16">
             <span className="font-mono-label text-primary mb-3 block">CORE VALUES</span>

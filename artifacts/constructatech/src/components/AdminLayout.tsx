@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Logo } from './Logo';
+import { ThemeToggle } from './ThemeToggle';
 import { LayoutDashboard, FileText, Users, FolderKanban, MessageSquare, Receipt, LogOut, ArrowLeft, Wrench } from 'lucide-react';
 import { useLogout } from '@workspace/api-client-react';
 
@@ -36,6 +37,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           </Link>
           <div className="mt-4 px-2 flex items-center justify-between">
             <span className="font-mono-label text-sidebar-primary">Admin Access</span>
+            <ThemeToggle className="text-sidebar-foreground/70 hover:text-white hover:bg-sidebar-accent" />
           </div>
         </div>
         

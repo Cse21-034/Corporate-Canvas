@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Logo } from './Logo';
+import { ThemeToggle } from './ThemeToggle';
 import { LayoutDashboard, FolderKanban, MessageSquare, Receipt, User, LogOut } from 'lucide-react';
 import { useLogout } from '@workspace/api-client-react';
 
@@ -32,8 +33,9 @@ export function PortalLayout({ children }: { children: ReactNode }) {
           <Link href="/">
             <Logo variant="light" size="sm" />
           </Link>
-          <div className="mt-4 px-2">
+          <div className="mt-4 px-2 flex items-center justify-between">
             <span className="font-mono-label text-white/50">Client Portal</span>
+            <ThemeToggle className="text-sidebar-foreground/70 hover:text-white hover:bg-sidebar-accent" />
           </div>
         </div>
         

@@ -38,7 +38,7 @@ export default function PortalLogin() {
   // have a session is redirected by the effect above once it resolves.
 
   return (
-    <div className="min-h-screen bg-foreground flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
+    <div className="min-h-screen bg-hero flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
       <div className="absolute top-8 left-8">
         <Link href="/" className="text-white/50 hover:text-white flex items-center gap-2 text-sm font-medium transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Website
@@ -58,14 +58,14 @@ export default function PortalLogin() {
           <div className="flex p-1 bg-muted rounded-lg mb-8">
             <button
               type="button"
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${role === 'customer' ? 'bg-white shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${role === 'customer' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
               onClick={() => setRole('customer')}
             >
               Client Portal
             </button>
             <button
               type="button"
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${role === 'staff' ? 'bg-white shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${role === 'staff' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
               onClick={() => setRole('staff')}
             >
               Staff Login
