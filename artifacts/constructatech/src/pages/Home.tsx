@@ -227,45 +227,29 @@ export default function Home() {
             <h2 className="font-display font-bold text-2xl md:text-4xl">Rooted in our heritage.</h2>
           </div>
 
-          <div className="relative max-w-4xl mx-auto">
-            {/* Dashed connector — path visits x=16.67/50/83.33%, the center
-                of each grid-cols-3 column, dipping between each pair.
-                preserveAspectRatio="none" lets it stretch to any container
-                width; non-scaling-stroke keeps the dash weight constant
-                despite that non-uniform scaling. */}
-            <svg
-              className="absolute left-0 top-8 w-full h-16 text-border hidden sm:block"
-              viewBox="0 0 100 20"
-              preserveAspectRatio="none"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M 16.67 4 C 25 20, 41.67 20, 50 4 C 58.33 20, 75 20, 83.33 4"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeDasharray="4 5"
-                strokeLinecap="round"
-                vectorEffect="non-scaling-stroke"
-              />
-            </svg>
+          <div className="relative grid md:grid-cols-3 gap-y-14 gap-x-10 md:gap-20">
+            <img
+              src="/VectorHIW.svg"
+              alt=""
+              className="hidden md:block absolute inset-x-0 top-10"
+            />
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-6">
-              {[
-                { sw: 'Boikanyego', en: 'RELIABILITY', desc: 'Building infrastructure that runs silently and perfectly, so you can focus on your business.' },
-                { sw: 'Puso', en: 'INNOVATION & OWNERSHIP', desc: 'Taking absolute ownership of our solutions, pushing the boundaries of what\'s possible locally.' },
-                { sw: 'Tirelo', en: 'SERVICE EXCELLENCE', desc: 'Uncompromising support and maintenance standards for every client, big or small.' },
-              ].map(({ sw, en, desc }, idx) => (
-                <div key={sw} className="text-center px-2 sm:px-4">
-                  <div className="relative z-10 w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                    <span className="font-display font-bold text-xl text-primary">{idx + 1}</span>
+            {[
+              { sw: 'Boikanyego', en: 'RELIABILITY', desc: 'Building infrastructure that runs silently and perfectly, so you can focus on your business.' },
+              { sw: 'Puso', en: 'INNOVATION & OWNERSHIP', desc: 'Taking absolute ownership of our solutions, pushing the boundaries of what\'s possible locally.' },
+              { sw: 'Tirelo', en: 'SERVICE EXCELLENCE', desc: 'Uncompromising support and maintenance standards for every client, big or small.' },
+            ].map(({ sw, en, desc }, idx) => (
+              <div key={sw} className="relative flex flex-col items-center max-w-xs mx-auto text-center">
+                <div className="relative z-10 w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+                  <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-bold text-lg">
+                    {idx + 1}
                   </div>
-                  <h3 className="font-display font-bold text-xl md:text-2xl text-foreground mb-1">{sw}</h3>
-                  <p className="font-mono-label text-muted-foreground mb-3 text-xs">{en}</p>
-                  <p className="text-muted-foreground text-sm md:text-base">{desc}</p>
                 </div>
-              ))}
-            </div>
+                <h3 className="font-display font-bold text-xl md:text-2xl text-foreground mb-1">{sw}</h3>
+                <p className="font-mono-label text-muted-foreground mb-3 text-xs">{en}</p>
+                <p className="text-muted-foreground text-sm md:text-base">{desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
