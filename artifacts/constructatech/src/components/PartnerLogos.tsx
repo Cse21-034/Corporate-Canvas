@@ -18,7 +18,7 @@ const PARTNERS: Partner[] = [
 
 function Wordmark({ name }: { name: string }) {
   return (
-    <span className="font-display font-bold text-lg md:text-xl tracking-tight text-muted-foreground transition-colors group-hover:text-foreground">
+    <span className="font-display font-bold text-2xl md:text-3xl tracking-tight text-foreground">
       {name.toUpperCase()}
     </span>
   );
@@ -37,23 +37,23 @@ function PartnerMark({ partner }: { partner: Partner }) {
     <img
       src={`https://cdn.simpleicons.org/${partner.slug}`}
       alt={`${partner.name} logo`}
-      width={112}
-      height={32}
+      width={224}
+      height={64}
       loading="lazy"
       decoding="async"
       onError={() => setFailed(true)}
-      className="h-7 md:h-8 w-auto object-contain opacity-60 grayscale transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+      className="h-12 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
     />
   );
 }
 
 export function PartnerLogos() {
   return (
-    <ul className="flex flex-wrap justify-center items-center gap-x-10 gap-y-8 md:gap-x-16">
+    <ul className="flex flex-wrap justify-center items-center gap-x-12 gap-y-10 md:gap-x-20">
       {PARTNERS.map((partner) => (
         <li
           key={partner.name}
-          className="group flex h-8 items-center justify-center"
+          className="group flex h-12 md:h-16 items-center justify-center"
           title={partner.name}
         >
           <PartnerMark partner={partner} />

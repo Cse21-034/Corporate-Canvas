@@ -49,10 +49,14 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Image collage — kept compact so it doesn't force the hero
-                taller than the viewport on shorter screens */}
-            <div className="relative max-w-[220px] sm:max-w-[260px] lg:max-w-[280px] mx-auto lg:mx-0">
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
+            {/* Image collage — sized to fill the column (w-full, capped only
+                on mobile where it's centered under the text) rather than a
+                small fixed px value. The text column is the taller of the
+                two either way, so this doesn't push the hero past one
+                viewport — it just closes the gap that made the collage look
+                small and off-balance against it. */}
+            <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-none mx-auto lg:mx-0">
+              <div className="grid grid-cols-2 gap-4 md:gap-5">
                 <img
                   src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=70"
                   alt="Data center infrastructure built by Constructatech Ventures"
@@ -61,32 +65,32 @@ export default function Home() {
                 <img
                   src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=70"
                   alt="Enterprise network cabling deployed by Constructatech Ventures"
-                  className="w-full aspect-[3/4] object-cover rounded-2xl shadow-lg mt-6 md:mt-7"
+                  className="w-full aspect-[3/4] object-cover rounded-2xl shadow-lg mt-9 md:mt-10"
                 />
               </div>
 
               {/* Floating stat card */}
               {stats && (
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-foreground text-background rounded-xl px-3.5 py-2.5 shadow-xl min-w-[128px]">
-                  <p className="font-mono-label text-background/60 text-[9px] mb-0.5">PROJECTS DELIVERED</p>
-                  <p className="font-display font-bold text-lg leading-none">{stats.projectsCompleted}+</p>
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-foreground text-background rounded-xl px-4 py-3 shadow-xl min-w-[140px]">
+                  <p className="font-mono-label text-background/60 text-[10px] mb-0.5">PROJECTS DELIVERED</p>
+                  <p className="font-display font-bold text-xl leading-none">{stats.projectsCompleted}+</p>
                 </div>
               )}
 
               {/* Floating status pill */}
-              <div className="absolute bottom-8 md:bottom-10 -left-3 md:-left-4 bg-card border border-border rounded-full pl-2 pr-3.5 py-1.5 shadow-lg flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 relative">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <span className="absolute w-1.5 h-1.5 rounded-full bg-primary animate-ping" />
+              <div className="absolute bottom-10 md:bottom-14 -left-3 md:-left-5 bg-card border border-border rounded-full pl-2 pr-4 py-2 shadow-lg flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 relative">
+                  <span className="w-2 h-2 rounded-full bg-primary" />
+                  <span className="absolute w-2 h-2 rounded-full bg-primary animate-ping" />
                 </span>
-                <span className="text-[11px] font-semibold text-foreground whitespace-nowrap">Network Status: Online</span>
+                <span className="text-xs font-semibold text-foreground whitespace-nowrap">Network Status: Online</span>
               </div>
 
               {/* Floating badge */}
               {stats && (
-                <div className="absolute -bottom-3 right-1 md:-right-3 w-16 h-16 md:w-[72px] md:h-[72px] rounded-full bg-foreground text-background flex flex-col items-center justify-center text-center shadow-xl border-4 border-background">
-                  <span className="font-display font-bold text-base leading-none">{stats.yearsActive}+</span>
-                  <span className="text-[8px] uppercase tracking-wide mt-1 text-background/70">Years</span>
+                <div className="absolute -bottom-4 right-2 md:-right-4 w-20 h-20 md:w-24 md:h-24 rounded-full bg-foreground text-background flex flex-col items-center justify-center text-center shadow-xl border-4 border-background">
+                  <span className="font-display font-bold text-lg md:text-xl leading-none">{stats.yearsActive}+</span>
+                  <span className="text-[9px] uppercase tracking-wide mt-1 text-background/70">Years</span>
                 </div>
               )}
             </div>
@@ -95,11 +99,13 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-full spectrum-rule" />
       </section>
 
-      {/* ── Stats Band ── */}
+      {/* ── Stats Band — commented out per request, replaced below with
+          the technology-partners strip. Data (stats.projectsCompleted etc.)
+          is still fetched above and used elsewhere on this page, so this
+          can be restored later without re-wiring anything. ──
       {stats && (
         <section className="bg-muted/50 py-10 md:py-16 border-b border-border">
           <div className="container mx-auto px-5 md:px-6">
-            {/* Mobile: 2×2 card grid. Desktop: 4-col divider row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border md:bg-transparent md:divide-x md:divide-border">
               {[
                 { value: `${stats.projectsCompleted}+`, label: 'Projects Completed', icon: Activity },
@@ -119,6 +125,15 @@ export default function Home() {
           </div>
         </section>
       )}
+      */}
+
+      {/* ── Technology Partners (replaces the Stats Band right under the hero) ── */}
+      <section className="bg-muted/50 py-12 md:py-20 border-b border-border">
+        <div className="container mx-auto px-5 md:px-6 text-center">
+          <span className="font-mono-label text-muted-foreground mb-8 md:mb-10 block text-xs">OUR TECHNOLOGY PARTNERS</span>
+          <PartnerLogos />
+        </div>
+      </section>
 
       {/* ── Services Showcase ── */}
       <section className="py-16 md:py-24 bg-background">
@@ -205,32 +220,52 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Affiliates Strip ── */}
-      <section className="py-12 md:py-16 bg-background border-y border-border">
-        <div className="container mx-auto px-5 md:px-6 text-center">
-          <span className="font-mono-label text-muted-foreground mb-6 md:mb-8 block text-xs">OUR TECHNOLOGY PARTNERS</span>
-          <PartnerLogos />
-        </div>
-      </section>
-
       {/* ── Values Band ── */}
       <section className="py-16 md:py-24 bg-background text-foreground border-t border-border">
         <div className="container mx-auto px-5 md:px-6">
-          <div className="text-center mb-10 md:mb-16">
+          <div className="text-center mb-16 md:mb-20">
             <h2 className="font-display font-bold text-2xl md:text-4xl">Rooted in our heritage.</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 md:gap-12">
-            {[
-              { sw: 'Boikanyego', en: 'RELIABILITY', desc: 'Building infrastructure that runs silently and perfectly, so you can focus on your business.' },
-              { sw: 'Puso', en: 'INNOVATION & OWNERSHIP', desc: 'Taking absolute ownership of our solutions, pushing the boundaries of what\'s possible locally.' },
-              { sw: 'Tirelo', en: 'SERVICE EXCELLENCE', desc: 'Uncompromising support and maintenance standards for every client, big or small.' },
-            ].map(({ sw, en, desc }) => (
-              <div key={sw} className="text-center px-2 sm:px-4">
-                <h3 className="font-display font-bold text-2xl md:text-3xl text-primary mb-1 md:mb-2">{sw}</h3>
-                <p className="font-mono-label text-muted-foreground mb-3 md:mb-4 text-xs">{en}</p>
-                <p className="text-muted-foreground text-sm md:text-base">{desc}</p>
-              </div>
-            ))}
+
+          <div className="relative max-w-4xl mx-auto">
+            {/* Dashed connector — path visits x=16.67/50/83.33%, the center
+                of each grid-cols-3 column, dipping between each pair.
+                preserveAspectRatio="none" lets it stretch to any container
+                width; non-scaling-stroke keeps the dash weight constant
+                despite that non-uniform scaling. */}
+            <svg
+              className="absolute left-0 top-8 w-full h-16 text-border hidden sm:block"
+              viewBox="0 0 100 20"
+              preserveAspectRatio="none"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M 16.67 4 C 25 20, 41.67 20, 50 4 C 58.33 20, 75 20, 83.33 4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeDasharray="4 5"
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-6">
+              {[
+                { sw: 'Boikanyego', en: 'RELIABILITY', desc: 'Building infrastructure that runs silently and perfectly, so you can focus on your business.' },
+                { sw: 'Puso', en: 'INNOVATION & OWNERSHIP', desc: 'Taking absolute ownership of our solutions, pushing the boundaries of what\'s possible locally.' },
+                { sw: 'Tirelo', en: 'SERVICE EXCELLENCE', desc: 'Uncompromising support and maintenance standards for every client, big or small.' },
+              ].map(({ sw, en, desc }, idx) => (
+                <div key={sw} className="text-center px-2 sm:px-4">
+                  <div className="relative z-10 w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                    <span className="font-display font-bold text-xl text-primary">{idx + 1}</span>
+                  </div>
+                  <h3 className="font-display font-bold text-xl md:text-2xl text-foreground mb-1">{sw}</h3>
+                  <p className="font-mono-label text-muted-foreground mb-3 text-xs">{en}</p>
+                  <p className="text-muted-foreground text-sm md:text-base">{desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
