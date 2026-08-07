@@ -16,6 +16,8 @@ tags:
     description: Industries served
   - name: quotes
     description: Quote requests
+  - name: newsletter
+    description: Newsletter subscriptions
   - name: auth
     description: Authentication
   - name: portal
@@ -119,6 +121,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/QuoteRequest"
+        "400":
+          description: Validation error
+
+  /newsletter/subscribe:
+    post:
+      operationId: subscribeNewsletter
+      tags: [newsletter]
+      summary: Subscribe to the newsletter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewsletterSubscribeInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsletterSubscriber"
         "400":
           description: Validation error
 
@@ -1151,6 +1174,26 @@ components:
         status:
           type: string
           enum: [new, contacted, quoted, won, lost]
+
+    NewsletterSubscribeInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+        honeypot:
+          type: ["string", "null"]
+
+    NewsletterSubscriber:
+      type: object
+      required: [id, email, createdAt]
+      properties:
+        id:
+          type: number
+        email:
+          type: string
+        createdAt:
+          type: string
 
     LoginInput:
       type: object

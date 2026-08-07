@@ -29,6 +29,8 @@ export * from './listPortalTicketsParams';
 export * from './loginInput';
 export * from './loginInputRole';
 export * from './milestone';
+export * from './newsletterSubscribeInput';
+export * from './newsletterSubscriber';
 export * from './portalDashboard';
 export * from './project';
 export * from './projectDeleteResult';

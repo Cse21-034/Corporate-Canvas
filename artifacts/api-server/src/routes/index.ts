@@ -3,6 +3,7 @@ import healthRouter from "./health";
 import authRouter from "./auth";
 import contentRouter from "./content";
 import quotesRouter from "./quotes";
+import newsletterRouter from "./newsletter";
 import portalRouter from "./portal";
 import adminRouter from "./admin";
 
@@ -12,6 +13,7 @@ router.use(healthRouter);
 router.use(authRouter);
 router.use(contentRouter);
 router.use(quotesRouter);
+router.use(newsletterRouter);
 router.use(portalRouter);
 router.use(adminRouter);
 

@@ -6,3 +6,4 @@ export * from "./projects";
 export * from "./tickets";
 export * from "./invoices";
 export * from "./quote-requests";
+export * from "./newsletter-subscribers";

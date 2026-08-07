@@ -204,6 +204,18 @@ export interface QuoteRequestUpdate {
   status?: QuoteRequestUpdateStatus;
 }
 
+export interface NewsletterSubscribeInput {
+  email: string;
+  /** @nullable */
+  honeypot?: string | null;
+}
+
+export interface NewsletterSubscriber {
+  id: number;
+  email: string;
+  createdAt: string;
+}
+
 export type LoginInputRole = typeof LoginInputRole[keyof typeof LoginInputRole];
 
 

@@ -114,6 +114,21 @@ export const SubmitQuoteRequestResponse = zod.object({
 
 
 /**
+ * @summary Subscribe to the newsletter
+ */
+export const SubscribeNewsletterBody = zod.object({
+  "email": zod.string(),
+  "honeypot": zod.string().nullish()
+})
+
+export const SubscribeNewsletterResponse = zod.object({
+  "id": zod.number(),
+  "email": zod.string(),
+  "createdAt": zod.string()
+})
+
+
+/**
  * @summary Log in
  */
 export const LoginBody = zod.object({
