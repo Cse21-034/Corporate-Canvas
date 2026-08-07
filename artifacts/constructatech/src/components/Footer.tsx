@@ -7,13 +7,14 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 // No live social accounts exist yet, so these are inert placeholders (#)
 // rather than fabricated links to profiles that don't exist — swap in the
-// real URLs once the accounts are set up.
+// real URLs once the accounts are set up. Each brand's real color, filled
+// circle, white glyph.
 const socialLinks = [
-  { icon: Facebook, label: 'Facebook', href: '#' },
-  { icon: Instagram, label: 'Instagram', href: '#' },
-  { icon: Twitter, label: 'Twitter', href: '#' },
-  { icon: Linkedin, label: 'LinkedIn', href: '#' },
-  { icon: Youtube, label: 'YouTube', href: '#' },
+  { icon: Facebook, label: 'Facebook', href: '#', bg: 'bg-[#1877F2]' },
+  { icon: Instagram, label: 'Instagram', href: '#', bg: 'bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF]' },
+  { icon: Twitter, label: 'Twitter', href: '#', bg: 'bg-black' },
+  { icon: Linkedin, label: 'LinkedIn', href: '#', bg: 'bg-[#0A66C2]' },
+  { icon: Youtube, label: 'YouTube', href: '#', bg: 'bg-[#FF0000]' },
 ];
 
 const navLinks = [
@@ -112,11 +113,11 @@ export function Footer() {
               Empowering Botswana Through Smart Infrastructure. We don't just install hardware; we build the digital backbone for your success.
             </p>
             <ul className="mt-6 flex gap-3">
-              {socialLinks.map(({ icon: Icon, label, href }) => (
+              {socialLinks.map(({ icon: Icon, label, href, bg }) => (
                 <li key={label}>
                   <a
                     href={href}
-                    className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
+                    className={`w-9 h-9 rounded-full flex items-center justify-center text-white hover:opacity-85 transition-opacity ${bg}`}
                   >
                     <span className="sr-only">{label}</span>
                     <Icon className="w-4 h-4" />
