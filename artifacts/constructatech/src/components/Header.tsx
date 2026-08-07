@@ -31,6 +31,7 @@ export function Header() {
   const useLightText = location.startsWith('/solutions/') && !isScrolled && !mobileMenuOpen;
 
   const navLinks = [
+    { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/solutions', label: 'Solutions' },
     { href: '/industries', label: 'Industries' },
