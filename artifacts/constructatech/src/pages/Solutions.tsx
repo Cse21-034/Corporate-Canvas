@@ -14,12 +14,12 @@ export default function Solutions() {
       <Header />
 
       <section className="pt-28 md:pt-32 pb-14 md:pb-20 bg-background text-foreground relative">
-        <div className="container mx-auto px-5 md:px-6 relative z-10">
+        <div className="container mx-auto px-5 md:px-6 relative z-10 text-center">
           <span className="font-mono-label text-primary mb-4 block">OUR EXPERTISE</span>
-          <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-6xl max-w-3xl mb-5 md:mb-6">
+          <h1 className="font-display font-bold text-3xl sm:text-4xl md:text-6xl max-w-3xl mx-auto mb-5 md:mb-6">
             Engineered Solutions
           </h1>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
             Precision IT infrastructure built for performance, security, and absolute reliability.
           </p>
         </div>
@@ -43,7 +43,7 @@ export default function Solutions() {
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top duration-300 z-10" />
 
                   {service.imageUrl && (
-                    <div className="relative aspect-[16/9] overflow-hidden bg-muted">
+                    <div className="relative aspect-[21/9] overflow-hidden bg-muted">
                       <img
                         src={service.imageUrl}
                         alt=""
