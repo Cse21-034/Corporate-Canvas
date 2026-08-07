@@ -39,7 +39,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-background text-foreground border-t border-border">
+    <footer className="bg-background text-foreground border-t border-border pb-20 md:pb-0">
       <div className="spectrum-rule w-full" />
 
       <div className="container mx-auto px-4 md:px-6 pt-12 md:pt-16 pb-8">
