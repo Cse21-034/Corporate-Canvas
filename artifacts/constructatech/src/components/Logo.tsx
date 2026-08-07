@@ -33,11 +33,13 @@ export function Logo({ variant = 'full', size = 'md' }: LogoProps) {
         className={`${s.mark} shrink-0 object-contain`}
       />
 
-      {/* Set to match the brand lockup: light weight, wide tracking, and
+      {/* Set to match the brand lockup: bold weight (consistent with the
+          bold display type used everywhere else on the site — a light
+          weight read as thin and washed-out here), tight tracking, and
           "VENTURES" beneath between two short bars. */}
       <div className="flex flex-col justify-center">
         <span
-          className={`font-display font-light leading-none tracking-[0.18em] ${s.wordmark} ${
+          className={`font-display font-bold leading-none tracking-[0.06em] ${s.wordmark} ${
             onDarkBackground ? 'text-white' : 'text-foreground'
           }`}
         >
