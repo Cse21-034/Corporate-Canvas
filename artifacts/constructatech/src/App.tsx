@@ -15,6 +15,7 @@ import About from './pages/About';
 import Solutions from './pages/Solutions';
 import SolutionDetail from './pages/SolutionDetail';
 import Industries from './pages/Industries';
+import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import PortalLogin from './pages/PortalLogin';
 
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/solutions" component={Solutions} />
       <Route path="/solutions/:slug" component={SolutionDetail} />
       <Route path="/industries" component={Industries} />
+      <Route path="/gallery" component={Gallery} />
       <Route path="/contact" component={Contact} />
       <Route path="/portal/login" component={PortalLogin} />
       

@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Logo } from './Logo';
 import { ThemeToggle } from './ThemeToggle';
-import { Menu, X, ArrowUpRight, Home, Mail, User, Info, Wrench, Factory } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Home, Mail, User, Info, Wrench, Factory, Image } from 'lucide-react';
 
 // The remaining links shown around the radial menu, evenly spaced starting
 // from the top and going clockwise. Precomputed unit-circle offsets (not
 // computed with Math.cos/sin at render time) so the layout is easy to check
-// by eye: top, lower-right, lower-left.
+// by eye: top, right, bottom, left.
 const RADIAL_LINKS = [
   { href: '/about', label: 'About', icon: Info, x: 0, y: -1 },
-  { href: '/solutions', label: 'Solutions', icon: Wrench, x: 0.866, y: 0.5 },
-  { href: '/industries', label: 'Industries', icon: Factory, x: -0.866, y: 0.5 },
+  { href: '/solutions', label: 'Solutions', icon: Wrench, x: 1, y: 0 },
+  { href: '/industries', label: 'Industries', icon: Factory, x: 0, y: 1 },
+  { href: '/gallery', label: 'Gallery', icon: Image, x: -1, y: 0 },
 ];
 const RADIAL_RADIUS = 108;
 
@@ -46,6 +47,7 @@ export function Header() {
     { href: '/about', label: 'About' },
     { href: '/solutions', label: 'Solutions' },
     { href: '/industries', label: 'Industries' },
+    { href: '/gallery', label: 'Gallery' },
     { href: '/contact', label: 'Contact' },
   ];
 

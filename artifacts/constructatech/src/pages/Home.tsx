@@ -138,27 +138,25 @@ export default function Home() {
       {/* ── Services Showcase ── */}
       <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-5 md:px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-12 mb-10 md:mb-14">
-            <div>
-              <span className="inline-flex items-center gap-2 bg-[#26331F] text-white text-xs font-medium px-3 py-1.5 rounded-full mb-5 md:mb-6">
-                <Wrench className="w-3.5 h-3.5" />
-                Our Solutions
-              </span>
-              <h2 className="font-['Instrument_Serif'] italic text-[#1F2A1D] text-3xl sm:text-4xl md:text-5xl leading-[1.15] max-w-md">
-                What we can do for you
-              </h2>
-            </div>
+          <div className="text-center mb-10 md:mb-14">
+            <span className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-medium px-3 py-1.5 rounded-full mb-5 md:mb-6">
+              <Wrench className="w-3.5 h-3.5" />
+              Our Solutions
+            </span>
+            <h2 className="font-display font-bold text-foreground text-3xl sm:text-4xl md:text-5xl leading-[1.15] max-w-md mx-auto mb-5 md:mb-6">
+              What we can do for you
+            </h2>
 
-            <div className="flex flex-col sm:flex-row sm:items-end gap-6 md:max-w-md">
-              <p className="text-[#5B5647] text-sm md:text-base leading-relaxed">
+            <div className="flex flex-col items-center gap-6">
+              <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md">
                 From infrastructure design to deployment and support, we provide reliable IT solutions tailored to your business needs.
               </p>
               <Link
                 href="/solutions"
-                className="group inline-flex items-center gap-3 bg-white text-[#1F2A1D] pl-5 pr-1.5 py-1.5 rounded-full text-sm font-medium shrink-0 hover:bg-white/90 transition-colors shadow-sm self-start sm:self-auto"
+                className="group inline-flex items-center gap-3 bg-card border border-border text-foreground pl-5 pr-1.5 py-1.5 rounded-full text-sm font-medium hover:bg-muted transition-colors shadow-sm"
               >
                 See our services
-                <span className="w-8 h-8 rounded-full bg-[#26331F] text-white flex items-center justify-center group-hover:translate-x-0.5 transition-transform shrink-0">
+                <span className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center group-hover:translate-x-0.5 transition-transform shrink-0">
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </Link>
@@ -185,7 +183,7 @@ export default function Home() {
                   <span className="absolute bottom-3 left-3 right-14 md:bottom-4 md:left-4 md:right-16 text-white font-medium text-sm md:text-base leading-tight">
                     {service.title}
                   </span>
-                  <span className="absolute bottom-3 right-3 md:bottom-4 md:right-4 w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#26331F] text-white flex items-center justify-center shrink-0 group-hover:bg-primary transition-colors">
+                  <span className="absolute bottom-3 right-3 md:bottom-4 md:right-4 w-9 h-9 md:w-10 md:h-10 rounded-full bg-foreground text-background flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                     <ArrowUpRight className="w-4 h-4" />
                   </span>
                 </Link>

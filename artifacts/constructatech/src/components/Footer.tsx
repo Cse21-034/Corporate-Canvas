@@ -20,6 +20,7 @@ const socialLinks = [
 const navLinks = [
   { text: 'About Us', href: '/about' },
   { text: 'Industries', href: '/industries' },
+  { text: 'Gallery', href: '/gallery' },
   { text: 'Contact', href: '/contact' },
   { text: 'Client Portal', href: '/portal/login' },
 ];
